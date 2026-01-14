@@ -1,0 +1,183 @@
+import { Restaurant, Dish, Category, PromoBanner } from '@/types';
+import { FiCoffee, FiZap, FiPieChart, FiPackage, FiHeart } from 'react-icons/fi';
+import { BurgerIcon } from '@/components/ui/BurgerIcon';
+
+export const categories: Category[] = [
+  { id: '1', name: 'Итальянская', icon: FiCoffee, color: 'var(--primary)' },
+  { id: '2', name: 'Азиатская', icon: FiZap, color: 'var(--secondary)' },
+  { id: '3', name: 'Бургеры', icon: BurgerIcon, color: 'var(--accent)' },
+  { id: '4', name: 'Пицца', icon: FiPieChart, color: 'var(--light)' },
+  { id: '5', name: 'Суши', icon: FiPackage, color: 'var(--primary)' },
+  { id: '6', name: 'Десерты', icon: FiHeart, color: 'var(--secondary)' },
+];
+
+export const promoBanners: PromoBanner[] = [
+  {
+    id: '1',
+    title: 'Скидка 30%',
+    description: 'На первое заказ от 500₽',
+    image: '/promo1.jpg',
+    discount: 30,
+  },
+  {
+    id: '2',
+    title: 'Бесплатная доставка',
+    description: 'При заказе от 800₽',
+    image: '/promo2.jpg',
+  },
+  {
+    id: '3',
+    title: 'Комбо обед',
+    description: 'Суп + основное + напиток за 299₽',
+    image: '/promo3.jpg',
+  },
+];
+
+export const restaurants: Restaurant[] = [
+  {
+    id: '1',
+    name: 'Итальянский двор',
+    image: '/restaurant1.jpg',
+    rating: 4.7,
+    deliveryTime: '25-35 мин',
+    deliveryFee: 150,
+    cuisines: ['Итальянская', 'Пицца'],
+    isOpen: true,
+    description: 'Лучшая итальянская кухня в городе с аутентичными рецептами',
+  },
+  {
+    id: '2',
+    name: 'Азиатский рай',
+    image: '/restaurant2.jpg',
+    rating: 4.5,
+    deliveryTime: '20-30 мин',
+    deliveryFee: 120,
+    cuisines: ['Азиатская', 'Китайская', 'Японская'],
+    isOpen: true,
+    description: 'Широкий выбор азиатской кухни от суши до горячих блюд',
+  },
+  {
+    id: '3',
+    name: 'Бургер Хаус',
+    image: '/restaurant3.jpg',
+    rating: 4.3,
+    deliveryTime: '15-25 мин',
+    deliveryFee: 100,
+    cuisines: ['Бургеры', 'Американская'],
+    isOpen: true,
+    description: 'Вкусные бургеры из свежих ингредиентов',
+  },
+  {
+    id: '4',
+    name: 'Пицца Палас',
+    image: '/restaurant4.jpg',
+    rating: 4.6,
+    deliveryTime: '30-40 мин',
+    deliveryFee: 180,
+    cuisines: ['Пицца', 'Итальянская'],
+    isOpen: false,
+    description: 'Традиционная итальянская пицца на тонком тесте',
+  },
+];
+
+export const dishes: Dish[] = [
+  {
+    id: '1',
+    name: 'Маргарита',
+    description: 'Классическая пицца с томатным соусом, моцареллой и базиликом',
+    price: 450,
+    image: '/dish1.jpg',
+    category: 'Пицца',
+    ingredients: ['Томатный соус', 'Моцарелла', 'Базилик', 'Оливковое масло'],
+    isVegetarian: true,
+    isPopular: true,
+    sizes: [
+      { id: 'small', name: '25 см', price: 350, calories: 680 },
+      { id: 'medium', name: '30 см', price: 450, calories: 920 },
+      { id: 'large', name: '35 см', price: 550, calories: 1200 },
+    ],
+  },
+  {
+    id: '2',
+    name: 'Карбонара',
+    description: 'Спагетти с беконом, яйцом, пармезаном и чёрным перцем',
+    price: 380,
+    image: '/dish2.jpg',
+    category: 'Паста',
+    ingredients: ['Спагетти', 'Бекон', 'Яйцо', 'Пармезан', 'Чёрный перец'],
+    isPopular: true,
+  },
+  {
+    id: '3',
+    name: 'Чизбургер',
+    description: 'Классический бургер с говяжьей котлетой и сыром',
+    price: 280,
+    image: '/dish3.jpg',
+    category: 'Бургеры',
+    ingredients: ['Говяжья котлета', 'Чеддер', 'Булочка', 'Салат', 'Помидор', 'Лук'],
+  },
+  {
+    id: '4',
+    name: 'Суши сет "Филадельфия"',
+    description: 'Набор из 8 роллов Филадельфия с лососем и сливочным сыром',
+    price: 650,
+    image: '/dish4.jpg',
+    category: 'Суши',
+    ingredients: ['Лосось', 'Рис', 'Нори', 'Сливочный сыр', 'Огурец'],
+    isPopular: true,
+  },
+  {
+    id: '5',
+    name: 'Том Ям',
+    description: 'Острый тайский суп с креветками, грибами и лимонной травой',
+    price: 420,
+    image: '/dish5.jpg',
+    category: 'Супы',
+    ingredients: ['Креветки', 'Грибы', 'Лимонная трава', 'Лайм', 'Кокосовое молоко', 'Чили'],
+    isSpicy: true,
+  },
+  {
+    id: '6',
+    name: 'Тирамису',
+    description: 'Классический итальянский десерт с маскарпоне и кофе',
+    price: 250,
+    image: '/dish6.jpg',
+    category: 'Десерты',
+    ingredients: ['Маскарпоне', 'Савоярди', 'Кофе', 'Какао', 'Яйцо'],
+    isVegetarian: true,
+  },
+];
+
+// Addons для блюд
+export const dishAddons = {
+  '1': [ // Маргарита
+    { id: 'extra-cheese', name: 'Дополнительный сыр', price: 80, category: 'cheese' },
+    { id: 'pepperoni', name: 'Пепперони', price: 120, category: 'meat' },
+    { id: 'olives', name: 'Оливки', price: 60, category: 'vegetables' },
+  ],
+  '2': [ // Карбонара
+    { id: 'extra-bacon', name: 'Дополнительный бекон', price: 100, category: 'meat' },
+    { id: 'extra-egg', name: 'Дополнительное яйцо', price: 50, category: 'protein' },
+    { id: 'extra-parmesan', name: 'Дополнительный пармезан', price: 70, category: 'cheese' },
+  ],
+  '3': [ // Чизбургер
+    { id: 'bacon', name: 'Бекон', price: 80, category: 'meat' },
+    { id: 'egg', name: 'Яйцо', price: 40, category: 'protein' },
+    { id: 'cheese', name: 'Дополнительный сыр', price: 50, category: 'cheese' },
+    { id: 'fries', name: 'Картофель фри', price: 120, category: 'side' },
+  ],
+  '4': [ // Суши сет
+    { id: 'wasabi', name: 'Васаби', price: 30, category: 'condiment' },
+    { id: 'ginger', name: 'Имбирь', price: 30, category: 'condiment' },
+    { id: 'soy-sauce', name: 'Соевый соус', price: 50, category: 'sauce' },
+  ],
+  '5': [ // Том Ям
+    { id: 'extra-shrimp', name: 'Дополнительные креветки', price: 150, category: 'protein' },
+    { id: 'coconut-milk', name: 'Кокосовое молоко', price: 80, category: 'sauce' },
+    { id: 'rice', name: 'Рис', price: 60, category: 'side' },
+  ],
+  '6': [ // Тирамису
+    { id: 'chocolate', name: 'Шоколадная крошка', price: 40, category: 'topping' },
+    { id: 'berries', name: 'Свежие ягоды', price: 80, category: 'topping' },
+  ],
+};
