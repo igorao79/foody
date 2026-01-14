@@ -14,7 +14,7 @@ export default function Home() {
   }
 
   return (
-    <Layout showBottomNav={true}>
+    <Layout showBottomNav={true} showFooter={true}>
       <MobileHeader />
       <MobileHomePage />
     </Layout>

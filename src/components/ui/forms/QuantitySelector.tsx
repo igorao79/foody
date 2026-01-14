@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Box, Text, HStack, IconButton } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiMinus, FiPlus } from 'react-icons/fi';

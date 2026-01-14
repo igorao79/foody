@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Box, Text, VStack, HStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { DishSize } from '@/types';

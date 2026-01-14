@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { Box } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Header } from '@/components/ui/Header';
+import { Header } from '@/components/ui/navigation/Header';
 import { RestaurantHeader } from '@/components/restaurant/RestaurantHeader';
 import { MenuTabs } from '@/components/restaurant/MenuTabs';
 import { FloatingCartButton } from '@/components/cart/FloatingCartButton';

@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
-import { FiSearch, FiUser, FiShoppingBag, FiCoffee, FiTruck, FiHome } from 'react-icons/fi';
+import { FiSearch, FiUser, FiShoppingBag, FiTruck, FiHome } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface DesktopHeaderProps {
   onSearch?: (query: string) => void;
@@ -56,13 +57,20 @@ export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderP
                 <Box
                   w="40px"
                   h="40px"
-                  bg="linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)"
                   borderRadius="var(--radius-lg)"
+                  overflow="hidden"
+                  bg="var(--white)"
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <Icon as={FiCoffee} boxSize={6} color="var(--white)" />
+                  <Image
+                    src="/images/logo.webp"
+                    alt="Фуди"
+                    width={32}
+                    height={32}
+                    style={{ objectFit: 'contain' }}
+                  />
                 </Box>
                 <VStack align="flex-start" gap={0}>
                   <Text
@@ -71,7 +79,7 @@ export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderP
                     color="var(--primary)"
                     lineHeight="1.1"
                   >
-                    FoodDelivery
+                    Фуди
                   </Text>
                   <Text
                     fontSize="var(--font-xs)"

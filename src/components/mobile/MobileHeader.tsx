@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
-import { FiSearch, FiShoppingBag, FiCoffee, FiTruck, FiHome } from 'react-icons/fi';
+import { FiSearch, FiShoppingBag, FiTruck, FiHome } from 'react-icons/fi';
+import Image from 'next/image';
 
 interface MobileHeaderProps {
   onSearch?: (query: string) => void;
@@ -48,13 +49,20 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               <Box
                 w="32px"
                 h="32px"
-                bg="linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)"
+                bg="var(--white)"
                 borderRadius="var(--radius-lg)"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
+                overflow="hidden"
               >
-                <FiCoffee size={16} color="white" />
+                <Image
+                  src="/images/logo.webp"
+                  alt="Фуди"
+                  width={24}
+                  height={24}
+                  style={{ objectFit: 'contain' }}
+                />
               </Box>
               <VStack align="flex-start" gap={0}>
                 <Text
@@ -63,7 +71,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
                   color="var(--primary)"
                   lineHeight="1"
                 >
-                  FoodDelivery
+                  Фуди
                 </Text>
                 <Text
                   fontSize="var(--font-xs)"

@@ -1,10 +1,10 @@
 'use client';
 
+import React from 'react';
 import { Box, Text, VStack, AspectRatio, Icon } from '@chakra-ui/react';
 import { FiGift } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { PromoBanner as PromoBannerType } from '@/types';
-import React from 'react';
 
 const MotionBox = motion(Box);
 

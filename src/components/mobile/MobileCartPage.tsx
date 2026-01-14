@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Button, Icon } from '@chakra-ui/react';
 import { FiShoppingCart } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import { Header } from '@/components/ui/Header';
+import { Header } from '@/components/ui/navigation/Header';
 import { CartItem } from '@/components/cart/CartItem';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { useCart } from '@/contexts/CartContext';

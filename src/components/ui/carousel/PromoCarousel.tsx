@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import React, {useState} from 'react';
 import { Box, Text, HStack, VStack } from '@chakra-ui/react';
 import { FiChevronLeft, FiChevronRight, FiGift, FiPercent, FiStar } from 'react-icons/fi';
-import { PromoModal } from './PromoModal';
+import { PromoModal } from '../modals/PromoModal';
 
 interface PromoItem {
   id: string;

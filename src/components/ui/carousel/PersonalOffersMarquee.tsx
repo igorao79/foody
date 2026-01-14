@@ -1,11 +1,10 @@
 'use client';
 
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Text, HStack, Icon, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiGift, FiPercent, FiStar, FiZap } from 'react-icons/fi';
-import { PersonalOffersModal } from './PersonalOffersModal';
+import { PersonalOffersModal } from '../modals/PersonalOffersModal';
 
 interface Offer {
   id: string;

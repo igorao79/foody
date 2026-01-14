@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Box, Text, AspectRatio, Icon } from '@chakra-ui/react';
 import { FiCoffee } from 'react-icons/fi';
 import { motion } from 'framer-motion';

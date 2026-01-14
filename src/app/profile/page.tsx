@@ -3,9 +3,9 @@
 import { Box, VStack, Text, HStack, Button, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
-import { Header } from '@/components/ui/Header';
+import { Header } from '@/components/ui/navigation/Header';
 import { DesktopHeader } from '@/components/desktop/DesktopHeader';
-import { PersonalOffersMarquee } from '@/components/ui/PersonalOffersMarquee';
+import { PersonalOffersMarquee } from '@/components/ui/carousel/PersonalOffersMarquee';
 import { useIsDesktop } from '@/hooks/useBreakpoint';
 import { FiUser, FiMapPin, FiCreditCard, FiHeart, FiShoppingBag, FiSettings } from 'react-icons/fi';
 

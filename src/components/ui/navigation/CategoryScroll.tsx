@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Box, Text, VStack, Icon, useBreakpointValue } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Category } from '@/types';

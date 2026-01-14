@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Text, VStack, HStack, Grid, GridItem, Container, Icon } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { RestaurantCard } from '@/components/ui/RestaurantCard';
-import { PromoCarousel } from '@/components/ui/PromoCarousel';
+import { RestaurantCard } from '@/components/ui/cards/RestaurantCard';
+import { PromoCarousel } from '@/components/ui/carousel/PromoCarousel';
 import { DesktopHeader } from './DesktopHeader';
 import { categories, restaurants } from '@/utils/mockData';
 

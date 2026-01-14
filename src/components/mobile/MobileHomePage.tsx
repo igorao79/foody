@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Text, VStack, HStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { CategoryScroll } from '@/components/ui/CategoryScroll';
-import { PromoBanner } from '@/components/ui/PromoBanner';
-import { RestaurantCard } from '@/components/ui/RestaurantCard';
-import { PersonalOffersMarquee } from '@/components/ui/PersonalOffersMarquee';
+import { CategoryScroll } from '@/components/ui/navigation/CategoryScroll';
+import { PromoBanner } from '@/components/ui/cards/PromoBanner';
+import { RestaurantCard } from '@/components/ui/cards/RestaurantCard';
+import { PersonalOffersMarquee } from '@/components/ui/carousel/PersonalOffersMarquee';
 import { categories, promoBanners, restaurants } from '@/utils/mockData';
 
 const MotionBox = motion(Box);

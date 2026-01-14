@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Box, VStack, Text, HStack, Button, Icon } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,12 +1,13 @@
 import { Restaurant, Dish, Category, PromoBanner } from '@/types';
-import { FiCoffee, FiZap, FiPieChart, FiPackage, FiHeart } from 'react-icons/fi';
-import { BurgerIcon } from '@/components/ui/BurgerIcon';
+import { FiCoffee, FiZap, FiPackage, FiHeart } from 'react-icons/fi';
+import { BurgerIcon } from '@/components/ui/icons/BurgerIcon';
+import { PizzaIcon } from '@/components/ui/icons/PizzaIcon';
 
 export const categories: Category[] = [
   { id: '1', name: 'Итальянская', icon: FiCoffee, color: 'var(--primary)' },
   { id: '2', name: 'Азиатская', icon: FiZap, color: 'var(--secondary)' },
   { id: '3', name: 'Бургеры', icon: BurgerIcon, color: 'var(--accent)' },
-  { id: '4', name: 'Пицца', icon: FiPieChart, color: 'var(--light)' },
+  { id: '4', name: 'Пицца', icon: PizzaIcon, color: 'var(--light)' },
   { id: '5', name: 'Суши', icon: FiPackage, color: 'var(--primary)' },
   { id: '6', name: 'Десерты', icon: FiHeart, color: 'var(--secondary)' },
 ];

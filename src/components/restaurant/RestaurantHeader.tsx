@@ -4,7 +4,7 @@ import { Box, Text, VStack, HStack, AspectRatio, Badge, Icon } from '@chakra-ui/
 import { FiHome } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Restaurant } from '@/types';
-import { Rating } from '@/components/ui/Rating';
+import { Rating } from '@/components/ui/feedback/Rating';
 
 const MotionBox = motion(Box);
 

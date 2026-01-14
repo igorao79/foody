@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Button, Textarea } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
-import { Header } from '@/components/ui/Header';
+import { Header } from '@/components/ui/navigation/Header';
 import { AddressSelector } from '@/components/order/AddressSelector';
 import { DeliveryTimeSelector } from '@/components/order/DeliveryTimeSelector';
 import { PaymentMethodSelector } from '@/components/order/PaymentMethodSelector';
