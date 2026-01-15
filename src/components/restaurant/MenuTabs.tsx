@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Box, Text, HStack, VStack, Icon, Input } from '@chakra-ui/react';
-import { FiCoffee, FiZap, FiSearch } from 'react-icons/fi';
+import { FiZap, FiSearch } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Dish } from '@/types';
 import { DishModal } from '@/components/ui/modals/DishModal';
@@ -156,26 +157,17 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
                 w="80px"
                 h="80px"
                 borderRadius="var(--radius-md)"
-                bg="linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%)"
                 flexShrink={0}
                 position="relative"
                 overflow="hidden"
               >
-                {/* Плейсхолдер для изображения */}
-                <Box
-                  position="absolute"
-                  top={0}
-                  left={0}
-                  right={0}
-                  bottom={0}
-                  bg="var(--gray-200)"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  opacity={0.1}
-                >
-                  <Icon as={FiCoffee} boxSize={8} />
-                </Box>
+                <Image
+                  src={dish.image}
+                  alt={dish.name}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="80px"
+                />
               </Box>
 
               {/* Информация о блюде */}

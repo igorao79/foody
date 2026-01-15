@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { CartItem, Cart, Dish, DishSize, DishAddon } from '@/types';
 
 type CartState = Cart;
@@ -13,13 +13,54 @@ type CartAction =
   | { type: 'APPLY_PROMO'; payload: { code: string; discount: number } }
   | { type: 'REMOVE_PROMO' };
 
-const initialState: CartState = {
-  items: [],
-  total: 0,
-  deliveryFee: 150, // рубли
-  discount: 0,
-  promoCode: undefined,
-};
+// Функция для загрузки корзины из localStorage
+function loadCartFromStorage(): CartState {
+  if (typeof window === 'undefined') {
+    return {
+      items: [],
+      total: 0,
+      deliveryFee: 150, // рубли
+      discount: 0,
+      promoCode: undefined,
+    };
+  }
+
+  try {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      // Пересчитываем общую сумму на случай изменений в логике расчета
+      const itemsTotal = parsedCart.items?.reduce((sum: number, item: CartItem) => sum + item.totalPrice, 0) || 0;
+      return {
+        ...parsedCart,
+        total: itemsTotal + parsedCart.deliveryFee - parsedCart.discount,
+      };
+    }
+  } catch (error) {
+    console.error('Error loading cart from localStorage:', error);
+  }
+
+  return {
+    items: [],
+    total: 0,
+    deliveryFee: 150, // рубли
+    discount: 0,
+    promoCode: undefined,
+  };
+}
+
+// Функция для сохранения корзины в localStorage
+function saveCartToStorage(cart: CartState) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  } catch (error) {
+    console.error('Error saving cart to localStorage:', error);
+  }
+}
+
+const initialState: CartState = loadCartFromStorage();
 
 function calculateItemTotal(dish: Dish, quantity: number, selectedSize?: DishSize, selectedAddons: DishAddon[] = []): number {
   const basePrice = selectedSize?.price || dish.price;
@@ -157,6 +198,11 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, dispatch] = useReducer(cartReducer, initialState);
+
+  // Сохраняем корзину в localStorage при каждом изменении
+  useEffect(() => {
+    saveCartToStorage(cart);
+  }, [cart]);
 
   const addItem = (dish: Dish, quantity: number, selectedSize?: DishSize, selectedAddons?: DishAddon[]) => {
     dispatch({ type: 'ADD_ITEM', payload: { dish, quantity, selectedSize, selectedAddons } });

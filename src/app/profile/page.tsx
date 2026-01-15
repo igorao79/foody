@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Button, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
@@ -7,6 +9,7 @@ import { Header } from '@/components/ui/navigation/Header';
 import { DesktopHeader } from '@/components/desktop/DesktopHeader';
 import { PersonalOffersMarquee } from '@/components/ui/carousel/PersonalOffersMarquee';
 import { useIsDesktop } from '@/hooks/useBreakpoint';
+import { useAuth } from '@/contexts/AuthContext';
 import { FiUser, FiMapPin, FiCreditCard, FiHeart, FiShoppingBag, FiSettings } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
@@ -56,6 +59,20 @@ const profileOptions: ProfileOption[] = [
 
 export default function ProfilePage() {
   const isDesktop = useIsDesktop();
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    }
+  }, [user, router]);
+
+  // Show loading or redirect while checking auth
+  if (!user) {
+    return null;
+  }
 
   const handleOptionClick = (optionId: string) => {
     // В будущем можно добавить навигацию к соответствующим страницам
@@ -63,8 +80,8 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-    // Логика выхода из аккаунта
-    console.log('Logout');
+    logout();
+    router.push('/login');
   };
 
   return (
@@ -109,13 +126,15 @@ export default function ProfilePage() {
 
                 <VStack align="flex-start" flex={1} gap="var(--space-2)">
                   <Text fontSize="var(--font-2xl)" fontWeight="var(--font-bold)" color="var(--primary)">
-                    Александр Петров
+                    {user.name || user.email.split('@')[0]}
                   </Text>
-                  <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                    +7 (999) 123-45-67
-                  </Text>
+                  {user.phone && (
+                    <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                      {user.phone}
+                    </Text>
+                  )}
                   <Text fontSize="var(--font-sm)" color="var(--gray-500)">
-                    alex.petrov@email.com
+                    {user.email}
                   </Text>
 
                   <HStack gap="var(--space-3)" mt="var(--space-2)">

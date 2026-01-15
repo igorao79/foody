@@ -1,17 +1,21 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { Box, VStack, HStack, Text, Container, Grid, GridItem, Badge, Icon } from '@chakra-ui/react';
-import { FiHome } from 'react-icons/fi';
+import { useState } from 'react';
+import Image from 'next/image';
+import { Box, VStack, HStack, Text, Container, Grid, GridItem, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { MenuTabs } from '@/components/restaurant/MenuTabs';
 import { DesktopHeader } from './DesktopHeader';
+import { Rating } from '@/components/ui/feedback/Rating';
+import { ReviewsModal } from '@/components/ui/modals/ReviewsModal';
 import { restaurants, dishes } from '@/utils/mockData';
 
 const MotionBox = motion(Box);
 
 export function DesktopRestaurantPage() {
   const params = useParams();
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
 
   const restaurantId = params?.id as string;
   const restaurant = restaurants.find(r => r.id === restaurantId);
@@ -29,10 +33,21 @@ export function DesktopRestaurantPage() {
   // Фильтруем блюда по restaurantId
   const restaurantDishes = dishes.filter(dish => dish.restaurantId === restaurantId);
 
+  const handleRatingClick = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setIsReviewsModalOpen(true);
+  };
+
   // handleDishClick больше не используется, модальное окно открывается в MenuTabs
 
   return (
     <>
+      <ReviewsModal
+        isOpen={isReviewsModalOpen}
+        onClose={() => setIsReviewsModalOpen(false)}
+        restaurantName={restaurant.name}
+      />
+
       <DesktopHeader showOrderType={false} />
 
       <Container maxW="1400px" py="var(--space-6)" pt="120px">
@@ -58,24 +73,16 @@ export function DesktopRestaurantPage() {
                   w="100%"
                   h="200px"
                   borderRadius="var(--radius-lg)"
-                  bg="linear-gradient(135deg, var(--secondary) 0%, var(--accent) 50%, var(--light) 100%)"
                   position="relative"
                   overflow="hidden"
                 >
-                  <Box
-                    position="absolute"
-                    top={0}
-                    left={0}
-                    right={0}
-                    bottom={0}
-                    bg="var(--gray-200)"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    opacity={0.1}
-                  >
-                    <Icon as={FiHome} boxSize={12} />
-                  </Box>
+                  <Image
+                    src={restaurant.image}
+                    alt={restaurant.name}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 1200px) 300px, 300px"
+                  />
 
                   {/* Статус открытия */}
                   <Box position="absolute" top="var(--space-3)" right="var(--space-3)">
@@ -111,9 +118,13 @@ export function DesktopRestaurantPage() {
 
                   <HStack gap="var(--space-4)">
                     <HStack gap="var(--space-1)">
-                      <Text fontSize="var(--font-sm)" fontWeight="var(--font-medium)" color="var(--primary)">
-                        ⭐ {restaurant.rating}
-                      </Text>
+                      <Rating
+                        value={restaurant.rating}
+                        size="sm"
+                        variant="outline"
+                        clickable
+                        onClick={handleRatingClick}
+                      />
                     </HStack>
                     <HStack gap="var(--space-1)">
                       <Text fontSize="var(--font-sm)" fontWeight="var(--font-medium)" color="var(--primary)">

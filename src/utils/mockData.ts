@@ -1,10 +1,9 @@
 import { Restaurant, Dish, Category, PromoBanner } from '@/types';
-import { GiPizzaSlice, GiNoodles, GiHamburger, GiSushis } from 'react-icons/gi';
+import { GiPizzaSlice, GiHamburger, GiSushis } from 'react-icons/gi';
 
 export const categories: Category[] = [
   { id: 'all', name: 'Все', icon: () => null, color: 'var(--primary)' },
   { id: '1', name: 'Итальянская', icon: GiPizzaSlice, color: 'var(--secondary)' },
-  { id: '2', name: 'Азиатская', icon: GiNoodles, color: 'var(--secondary)' },
   { id: '3', name: 'Американская', icon: GiHamburger, color: 'var(--secondary)' },
   { id: '4', name: 'Японская', icon: GiSushis, color: 'var(--secondary)' },
 ];
@@ -35,7 +34,7 @@ export const restaurants: Restaurant[] = [
   {
     id: '1',
     name: 'Итальянский двор',
-    image: '/restaurant1.jpg',
+    image: '/images/restaurants/italian.webp',
     rating: 4.7,
     deliveryTime: '25-35 мин',
     deliveryFee: 150,
@@ -47,19 +46,19 @@ export const restaurants: Restaurant[] = [
   {
     id: '2',
     name: 'Азиатский рай',
-    image: '/restaurant2.jpg',
+    image: '/images/restaurants/japan.webp',
     rating: 4.5,
     deliveryTime: '20-30 мин',
     deliveryFee: 120,
-    cuisines: ['Азиатская', 'Китайская', 'Японская'],
-    tags: ['азиатская', 'том ям', 'супы', 'креветки', 'лайм'],
+    cuisines: ['Китайская', 'Японская'],
+    tags: ['том ям', 'супы', 'креветки', 'лайм'],
     isOpen: true,
     description: 'Широкий выбор азиатской кухни от суши до горячих блюд',
   },
   {
     id: '3',
     name: 'Бургер Хаус',
-    image: '/restaurant3.jpg',
+    image: '/images/restaurants/american.webp',
     rating: 4.3,
     deliveryTime: '15-25 мин',
     deliveryFee: 100,
@@ -71,7 +70,7 @@ export const restaurants: Restaurant[] = [
   {
     id: '4',
     name: 'Пицца Палас',
-    image: '/restaurant4.jpg',
+    image: '/images/restaurants/italian2.webp',
     rating: 4.6,
     deliveryTime: '30-40 мин',
     deliveryFee: 180,

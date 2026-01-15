@@ -2,29 +2,24 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { Box, Flex, Icon, Text } from '@chakra-ui/react';
-import { FiHome, FiSearch, FiShoppingBag, FiUser, FiHeart } from 'react-icons/fi';
+import { FiHome, FiSearch, FiShoppingBag, FiUser, FiHeart, FiLogIn } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MotionBox = motion(Box);
-
-interface NavItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ size?: string | number }>;
-  path: string;
-}
-
-const navItems: NavItem[] = [
-  { id: 'home', label: 'Главная', icon: FiHome, path: '/' },
-  { id: 'search', label: 'Поиск', icon: FiSearch, path: '/search' },
-  { id: 'orders', label: 'Заказы', icon: FiShoppingBag, path: '/orders' },
-  { id: 'favorites', label: 'Избранное', icon: FiHeart, path: '/favorites' },
-  { id: 'profile', label: 'Профиль', icon: FiUser, path: '/profile' },
-];
 
 export function BottomNavigation() {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const navItems = [
+    { id: 'home', label: 'Главная', icon: FiHome, path: '/' },
+    { id: 'search', label: 'Поиск', icon: FiSearch, path: '/search' },
+    { id: 'orders', label: 'Заказы', icon: FiShoppingBag, path: '/orders' },
+    { id: 'favorites', label: 'Избранное', icon: FiHeart, path: '/favorites' },
+    { id: 'profile', label: user ? 'Профиль' : 'Вход', icon: user ? FiUser : FiLogIn, path: user ? '/profile' : '/login' },
+  ];
 
   const handleNavigate = (path: string) => {
     router.push(path);

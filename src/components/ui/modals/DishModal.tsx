@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   Box,
   Text,
@@ -10,16 +11,10 @@ import {
   Button,
   AspectRatio,
   Badge,
+  Dialog,
+  Portal,
 } from '@chakra-ui/react';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-} from '@chakra-ui/modal';
-import { FiCoffee, FiZap, FiPlus, FiMinus } from 'react-icons/fi';
+import { FiZap, FiPlus, FiMinus } from 'react-icons/fi';
 import { Dish } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 
@@ -49,45 +44,49 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
 
   const totalPrice = dish.price * quantity;
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" isCentered>
-      <ModalOverlay backdropFilter="blur(4px)" />
-      <ModalContent borderRadius="var(--radius-xl)" overflow="hidden">
-        <ModalHeader p={0}>
-          <AspectRatio ratio={16 / 10}>
-            <Box
-              bg="linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%)"
-              position="relative"
-            >
-              {/* Плейсхолдер для изображения */}
-              <Box
-                position="absolute"
-                top={0}
-                left={0}
-                right={0}
-                bottom={0}
-                bg="var(--gray-200)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                opacity={0.1}
-              >
-                <Icon as={FiCoffee} boxSize={12} />
-              </Box>
-            </Box>
-          </AspectRatio>
-          <ModalCloseButton
-            position="absolute"
-            top="var(--space-3)"
-            right="var(--space-3)"
-            bg="rgba(255, 255, 255, 0.9)"
-            backdropFilter="blur(10px)"
-            borderRadius="var(--radius-full)"
-            _hover={{ bg: 'var(--white)' }}
-          />
-        </ModalHeader>
+  if (!isOpen) return null;
 
-        <ModalBody p="var(--space-6)">
+  return (
+    <Portal>
+      <Box
+        position="fixed"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        zIndex={9999}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        p={4}
+      >
+        <Dialog.Root open={isOpen} onOpenChange={onClose} size="md">
+          <Dialog.Backdrop />
+          <Dialog.Content borderRadius="var(--radius-xl)" maxW="500px" w="90%">
+            <Box p={0}>
+              <AspectRatio ratio={16 / 10}>
+                <Box position="relative">
+                  <Image
+                    src={dish.image}
+                    alt={dish.name}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <Dialog.CloseTrigger
+                    position="absolute"
+                    top="var(--space-3)"
+                    right="var(--space-3)"
+                    bg="rgba(255, 255, 255, 0.9)"
+                    backdropFilter="blur(10px)"
+                    borderRadius="var(--radius-full)"
+                    _hover={{ bg: 'var(--white)' }}
+                  />
+                </Box>
+              </AspectRatio>
+            </Box>
+
+            <Dialog.Body p="var(--space-6)">
           <VStack align="stretch" gap="var(--space-4)">
             {/* Название и цена */}
             <VStack align="stretch" gap="var(--space-2)">
@@ -263,8 +262,10 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
               Добавить в корзину
             </Button>
           </VStack>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+            </Dialog.Body>
+          </Dialog.Content>
+        </Dialog.Root>
+      </Box>
+    </Portal>
   );
 }
