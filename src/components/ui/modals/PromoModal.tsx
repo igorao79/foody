@@ -108,6 +108,7 @@ export function PromoModal({ isOpen, onClose, promo }: PromoModalProps) {
               right="var(--space-3)"
               as="button"
               onClick={onClose}
+              cursor="pointer"
               color="var(--gray-400)"
               _hover={{ color: 'var(--gray-600)' }}
             >
@@ -186,6 +187,7 @@ export function PromoModal({ isOpen, onClose, promo }: PromoModalProps) {
                     size="sm"
                     variant="ghost"
                     onClick={handleCopyCode}
+                    cursor="pointer"
                     _hover={{ bg: 'var(--gray-100)' }}
                   >
                     <FiCopy size={16} />
@@ -216,6 +218,7 @@ export function PromoModal({ isOpen, onClose, promo }: PromoModalProps) {
               py="var(--space-3)"
               _hover={{ bg: promo.color, opacity: 0.9 }}
               onClick={onClose}
+              cursor="pointer"
             >
               Применить акцию
             </Button>

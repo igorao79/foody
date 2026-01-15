@@ -49,6 +49,7 @@ export function AddressSelector({ selectedAddress, onAddressSelect, onAddNewAddr
             key={address.id}
             as="button"
             onClick={() => onAddressSelect(address)}
+            cursor="pointer"
             p="var(--space-4)"
             borderRadius="var(--radius-lg)"
             border={selectedAddress?.id === address.id ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
@@ -92,6 +93,7 @@ export function AddressSelector({ selectedAddress, onAddressSelect, onAddNewAddr
         fontSize="var(--font-base)"
         leftIcon={<FiPlus />}
         onClick={onAddNewAddress}
+        cursor="pointer"
         _hover={{
           bg: 'var(--primary)',
           color: 'var(--white)',

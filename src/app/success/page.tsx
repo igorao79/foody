@@ -146,6 +146,7 @@ export default function SuccessPage() {
                 fontSize="var(--font-base)"
                 fontWeight="var(--font-semibold)"
                 py="var(--space-4)"
+                cursor="pointer"
                 _hover={{ bg: 'var(--secondary)' }}
                 onClick={handleTrackOrder}
               >
@@ -161,6 +162,7 @@ export default function SuccessPage() {
                 fontSize="var(--font-base)"
                 fontWeight="var(--font-semibold)"
                 py="var(--space-4)"
+                cursor="pointer"
                 _hover={{
                   bg: 'var(--primary)',
                   color: 'var(--white)',

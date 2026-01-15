@@ -50,6 +50,7 @@ export function DeliveryTimeSelector({ selectedTime, onTimeSelect }: DeliveryTim
         <MotionBox
           as="button"
           onClick={() => handleTimeSelect('asap')}
+          cursor="pointer"
           p="var(--space-4)"
           borderRadius="var(--radius-lg)"
           border={selectedTime === 'asap' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
@@ -78,6 +79,7 @@ export function DeliveryTimeSelector({ selectedTime, onTimeSelect }: DeliveryTim
         <MotionBox
           as="button"
           onClick={() => handleTimeSelect(timeOptions[0] || '12:00')}
+          cursor="pointer"
           p="var(--space-4)"
           borderRadius="var(--radius-lg)"
           border={selectedTime !== 'asap' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}

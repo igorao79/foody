@@ -47,6 +47,7 @@ export function BottomNavigation() {
               key={item.id}
               as="button"
               onClick={() => handleNavigate(item.path)}
+              cursor="pointer"
               display="flex"
               flexDirection="column"
               alignItems="center"

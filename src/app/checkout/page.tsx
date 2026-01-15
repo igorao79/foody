@@ -181,6 +181,7 @@ export default function CheckoutPage() {
             fontSize="var(--font-lg)"
             fontWeight="var(--font-bold)"
             py="var(--space-4)"
+            cursor="pointer"
             _hover={{ bg: !selectedAddress ? 'var(--gray-400)' : 'var(--secondary)' }}
             _active={{ bg: !selectedAddress ? 'var(--gray-400)' : 'var(--secondary)' }}
             onClick={handlePlaceOrder}

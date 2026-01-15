@@ -230,6 +230,7 @@ export function DesktopCartPage() {
                   fontSize="var(--font-lg)"
                   fontWeight="var(--font-bold)"
                   py="var(--space-4)"
+                  cursor="pointer"
                   _hover={{ bg: 'var(--secondary)' }}
                   _active={{ bg: 'var(--secondary)' }}
                   onClick={handleCheckout}

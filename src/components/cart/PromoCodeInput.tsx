@@ -58,6 +58,7 @@ export function PromoCodeInput({ currentPromo, onApplyPromo, onRemovePromo }: Pr
             variant="ghost"
             color="var(--white)"
             opacity={0.8}
+            cursor="pointer"
             _hover={{ opacity: 1, bg: 'rgba(255,255,255,0.1)' }}
             onClick={handleRemove}
           >
@@ -74,6 +75,7 @@ export function PromoCodeInput({ currentPromo, onApplyPromo, onRemovePromo }: Pr
         <MotionBox
           as="button"
           onClick={() => setIsExpanded(true)}
+          cursor="pointer"
           p="var(--space-3)"
           borderRadius="var(--radius-lg)"
           border="1px dashed var(--gray-300)"
@@ -123,6 +125,7 @@ export function PromoCodeInput({ currentPromo, onApplyPromo, onRemovePromo }: Pr
               />
               <Button
                 onClick={handleApply}
+                cursor="pointer"
                 bg="var(--primary)"
                 color="var(--white)"
                 borderRadius="var(--radius-md)"
@@ -138,6 +141,7 @@ export function PromoCodeInput({ currentPromo, onApplyPromo, onRemovePromo }: Pr
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(false)}
+              cursor="pointer"
               color="var(--gray-500)"
             >
               Отмена

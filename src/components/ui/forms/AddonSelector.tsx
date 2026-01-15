@@ -64,6 +64,7 @@ export function AddonSelector({ addons, selectedAddons, onAddonToggle }: AddonSe
                     <HStack
                       as="button"
                       onClick={() => onAddonToggle(addon)}
+                      cursor="pointer"
                       p="var(--space-3)"
                       borderRadius="var(--radius-lg)"
                       border="1px solid var(--gray-200)"

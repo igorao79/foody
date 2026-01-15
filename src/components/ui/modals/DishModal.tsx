@@ -243,6 +243,7 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
             {/* Кнопка добавления в корзину */}
             <Button
               onClick={handleAddToCart}
+              cursor="pointer"
               bg="var(--primary)"
               color="var(--white)"
               size="lg"

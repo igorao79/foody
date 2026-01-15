@@ -36,6 +36,7 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
       transition={{ duration: 0.3 }}
       as="button"
       onClick={onClick}
+      cursor="pointer"
       mx="var(--space-4)"
       mb="var(--space-4)"
       borderRadius="var(--radius-lg)"

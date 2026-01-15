@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Button, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
@@ -8,9 +8,10 @@ import { Layout } from '@/components/layout/Layout';
 import { Header } from '@/components/ui/navigation/Header';
 import { DesktopHeader } from '@/components/desktop/DesktopHeader';
 import { PersonalOffersMarquee } from '@/components/ui/carousel/PersonalOffersMarquee';
+import { SupportChatModal } from '@/components/ui/modals/SupportChatModal';
 import { useIsDesktop } from '@/hooks/useBreakpoint';
 import { useAuth } from '@/contexts/AuthContext';
-import { FiUser, FiMapPin, FiCreditCard, FiHeart, FiShoppingBag, FiSettings } from 'react-icons/fi';
+import { FiUser, FiMapPin, FiCreditCard, FiHeart, FiShoppingBag, FiSettings, FiHelpCircle } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
@@ -50,6 +51,12 @@ const profileOptions: ProfileOption[] = [
     description: 'Карты и платежные методы'
   },
   {
+    id: 'support',
+    label: 'Поддержка',
+    icon: FiHelpCircle,
+    description: 'Связаться с поддержкой'
+  },
+  {
     id: 'settings',
     label: 'Настройки',
     icon: FiSettings,
@@ -61,6 +68,7 @@ export default function ProfilePage() {
   const isDesktop = useIsDesktop();
   const { user, logout } = useAuth();
   const router = useRouter();
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -75,8 +83,15 @@ export default function ProfilePage() {
   }
 
   const handleOptionClick = (optionId: string) => {
-    // В будущем можно добавить навигацию к соответствующим страницам
-    console.log('Selected option:', optionId);
+    switch (optionId) {
+      case 'support':
+        setIsChatOpen(true);
+        break;
+      default:
+        // В будущем можно добавить навигацию к соответствующим страницам
+        console.log('Selected option:', optionId);
+        break;
+    }
   };
 
   const handleLogout = () => {
@@ -211,6 +226,7 @@ export default function ProfilePage() {
                     key={option.id}
                     as="button"
                     onClick={() => handleOptionClick(option.id)}
+                    cursor="pointer"
                     p="var(--space-4)"
                     borderRadius="var(--radius-lg)"
                     bg="var(--gray-50)"
@@ -264,6 +280,7 @@ export default function ProfilePage() {
               {/* Кнопка выхода */}
               <Button
                 onClick={handleLogout}
+                cursor="pointer"
                 variant="outline"
                 colorScheme="red"
                 w="100%"
@@ -280,6 +297,12 @@ export default function ProfilePage() {
           </MotionBox>
         </Box>
       </Box>
+
+      {/* Чат поддержки */}
+      <SupportChatModal
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+      />
     </>
   );
 }

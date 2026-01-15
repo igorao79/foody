@@ -9,6 +9,7 @@ import { MenuTabs } from '@/components/restaurant/MenuTabs';
 import { DesktopHeader } from './DesktopHeader';
 import { Rating } from '@/components/ui/feedback/Rating';
 import { ReviewsModal } from '@/components/ui/modals/ReviewsModal';
+import { SupportChatWidget } from '@/components/ui/SupportChatWidget';
 import { restaurants, dishes } from '@/utils/mockData';
 
 const MotionBox = motion(Box);
@@ -168,6 +169,9 @@ export function DesktopRestaurantPage() {
         </Grid>
         </MotionBox>
       </Container>
+
+      {/* Виджет поддержки */}
+      <SupportChatWidget />
     </>
   );
 }

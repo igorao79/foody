@@ -7,6 +7,7 @@ import { FiZap, FiSearch } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Dish } from '@/types';
 import { DishModal } from '@/components/ui/modals/DishModal';
+import { DishPreviewModal } from '@/components/ui/modals/DishPreviewModal';
 import { CompactQuantitySelector } from '@/components/ui/forms/CompactQuantitySelector';
 import { useCart } from '@/contexts/CartContext';
 
@@ -14,14 +15,14 @@ const MotionBox = motion(Box);
 
 interface MenuTabsProps {
   dishes: Dish[];
-  onDishClick?: (dish: Dish) => void;
 }
 
-export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
+export function MenuTabs({ dishes }: MenuTabsProps) {
   const { getItemQuantity } = useCart();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Группируем блюда по категориям
@@ -48,10 +49,11 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
 
   const handleDishClick = (dish: Dish) => {
     setSelectedDish(dish);
-    setIsModalOpen(true);
+    setIsPreviewModalOpen(true);
   };
 
-  const handleQuantityChange = (dishId: string, quantity: number) => {
+
+  const handleQuantityChange = () => {
     // Обновление количества обрабатывается в CompactQuantitySelector через CartContext
   };
 
@@ -117,6 +119,7 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
                 key={category}
                 as="button"
                 onClick={() => handleTabClick(category)}
+                cursor="pointer"
                 px="var(--space-3)"
                 py="var(--space-2)"
                 borderRadius="var(--radius-md)"
@@ -143,6 +146,8 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
           return (
             <MotionBox
               key={dish.id}
+              as="button"
+              onClick={() => handleDishClick(dish)}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               w="100%"
@@ -150,23 +155,30 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
               borderBottom="1px solid var(--gray-100)"
               _last={{ borderBottom: 'none' }}
               textAlign="left"
+              cursor="pointer"
+              _hover={{ bg: 'var(--gray-50)' }}
+              _active={{ bg: 'var(--gray-100)' }}
             >
             <HStack gap="var(--space-4)" align="flex-start">
               {/* Фото блюда */}
               <Box
-                w="80px"
-                h="80px"
-                borderRadius="var(--radius-md)"
-                flexShrink={0}
                 position="relative"
+                w="80px"
+                h="70px"
+                borderRadius="var(--radius-md)"
                 overflow="hidden"
+                flexShrink={0}
               >
                 <Image
                   src={dish.image}
                   alt={dish.name}
                   fill
-                  style={{ objectFit: 'cover' }}
                   sizes="80px"
+                  quality={85}
+                  style={{
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                  }}
                 />
               </Box>
 
@@ -217,7 +229,7 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
                     </HStack>
                   </VStack>
 
-                  <VStack align="center" gap="var(--space-1)">
+                  <VStack align="center" gap="var(--space-1)" onClick={(e) => e.stopPropagation()}>
                     <Text
                       fontSize="var(--font-lg)"
                       fontWeight="var(--font-bold)"
@@ -229,7 +241,7 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
                     <CompactQuantitySelector
                       dish={dish}
                       quantity={quantity}
-                      onQuantityChange={(newQuantity) => handleQuantityChange(dish.id, newQuantity)}
+                      onQuantityChange={handleQuantityChange}
                     />
                   </VStack>
                 </HStack>
@@ -239,6 +251,13 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
           );
         })}
       </VStack>
+
+      {/* Модальное окно предварительного просмотра блюда */}
+      <DishPreviewModal
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        dish={selectedDish}
+      />
 
       {/* Модальное окно блюда */}
       <DishModal

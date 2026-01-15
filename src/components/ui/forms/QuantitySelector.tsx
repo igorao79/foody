@@ -42,6 +42,7 @@ export function QuantitySelector({
         <IconButton
           aria-label="Уменьшить количество"
           onClick={handleDecrement}
+          cursor="pointer"
           disabled={quantity <= minQuantity}
           size="sm"
           variant="outline"
@@ -79,6 +80,7 @@ export function QuantitySelector({
         <IconButton
           aria-label="Увеличить количество"
           onClick={handleIncrement}
+          cursor="pointer"
           disabled={quantity >= maxQuantity}
           size="sm"
           variant="outline"

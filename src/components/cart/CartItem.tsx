@@ -5,6 +5,7 @@ import { FiCoffee } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { CartItem as CartItemType } from '@/types';
+import Image from 'next/image';
 
 const MotionBox = motion(Box);
 
@@ -45,25 +46,17 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
           w="80px"
           h="80px"
           borderRadius="var(--radius-md)"
-          bg="linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%)"
           flexShrink={0}
           position="relative"
           overflow="hidden"
         >
-          <Box
-            position="absolute"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
-            bg="var(--gray-200)"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            opacity={0.1}
-          >
-            <Icon as={FiCoffee} boxSize={8} />
-          </Box>
+          <Image
+            src={item.dish.image}
+            alt={item.dish.name}
+            fill
+            style={{ objectFit: 'cover' }}
+            sizes="80px"
+          />
         </Box>
 
         {/* Информация о товаре */}
@@ -111,6 +104,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
             <IconButton
               aria-label="Уменьшить количество"
               onClick={handleDecrement}
+              cursor="pointer"
               size="sm"
               variant="outline"
               borderColor="var(--gray-300)"
@@ -143,6 +137,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
             <IconButton
               aria-label="Увеличить количество"
               onClick={handleIncrement}
+              cursor="pointer"
               size="sm"
               variant="outline"
               borderColor="var(--gray-300)"
@@ -161,6 +156,7 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
         <IconButton
           aria-label="Удалить из корзины"
           onClick={() => onRemove(item.id)}
+          cursor="pointer"
           size="sm"
           variant="ghost"
           color="var(--gray-400)"

@@ -126,6 +126,7 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
             key={item.id}
             as="button"
             onClick={() => handlePromoClick(item)}
+            cursor="pointer"
             p="var(--space-3)"
             borderRadius="var(--radius-md)"
             bg="var(--gray-50)"
@@ -172,6 +173,7 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
         <Box
           as="button"
           onClick={() => setCurrentPage((prev) => (prev > 0 ? prev - 1 : totalPages - 1))}
+          cursor="pointer"
           color="var(--gray-400)"
           _hover={{ color: 'var(--primary)' }}
           transition="color 0.2s ease"
@@ -187,6 +189,7 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
               key={index}
               as="button"
               onClick={() => handleDotClick(index)}
+              cursor="pointer"
               w="8px"
               h="8px"
               borderRadius="var(--radius-full)"
@@ -203,6 +206,7 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
         <Box
           as="button"
           onClick={() => setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0))}
+          cursor="pointer"
           color="var(--gray-400)"
           _hover={{ color: 'var(--primary)' }}
           transition="color 0.2s ease"

@@ -21,6 +21,7 @@ export function PromoBanner({ banner, onClick }: PromoBannerProps) {
       transition={{ duration: 0.3 }}
       as="button"
       onClick={onClick}
+      cursor="pointer"
       mx="var(--space-4)"
       borderRadius="var(--radius-xl)"
       overflow="hidden"

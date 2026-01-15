@@ -78,6 +78,7 @@ export function Header({
               variant="ghost"
               size="sm"
               onClick={handleBackClick}
+              cursor="pointer"
               color="var(--primary)"
               _hover={{ bg: 'var(--gray-100)' }}
             >
@@ -102,6 +103,7 @@ export function Header({
               variant="ghost"
               size="sm"
               onClick={onFavoriteClick}
+              cursor="pointer"
               color="var(--gray-600)"
               _hover={{ bg: 'var(--gray-100)', color: 'var(--accent)' }}
             >
@@ -114,6 +116,7 @@ export function Header({
               variant="ghost"
               size="sm"
               onClick={onShareClick}
+              cursor="pointer"
               color="var(--gray-600)"
               _hover={{ bg: 'var(--gray-100)' }}
             >
@@ -127,6 +130,7 @@ export function Header({
                 variant="ghost"
                 size="sm"
                 onClick={handleCartClick}
+                cursor="pointer"
                 color="var(--gray-600)"
                 _hover={{ bg: 'var(--gray-100)', color: 'var(--primary)' }}
               >

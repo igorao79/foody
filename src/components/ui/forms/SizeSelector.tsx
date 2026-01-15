@@ -42,6 +42,7 @@ export function SizeSelector({ sizes, selectedSize, onSizeSelect }: SizeSelector
               transition={{ duration: 0.3, delay: index * 0.1 }}
               as="button"
               onClick={() => onSizeSelect(size)}
+              cursor="pointer"
               p="var(--space-3)"
               borderRadius="var(--radius-lg)"
               border={isSelected ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}

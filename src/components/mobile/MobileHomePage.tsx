@@ -9,6 +9,7 @@ import { PromoBanner } from '@/components/ui/cards/PromoBanner';
 import { RestaurantCard } from '@/components/ui/cards/RestaurantCard';
 import { PersonalOffersMarquee } from '@/components/ui/carousel/PersonalOffersMarquee';
 import { categories, promoBanners, restaurants, dishes } from '@/utils/mockData';
+import { ScrollToTopButton } from '@/components/ui/ScrollToTopButton';
 import { useCart } from '@/contexts/CartContext';
 
 const MotionBox = motion(Box);
@@ -169,14 +170,6 @@ export function MobileHomePage({ onSearch }: { onSearch?: (query: string) => voi
               </Text>
             )}
           </VStack>
-          <Text
-            fontSize="var(--font-sm)"
-            color="var(--accent)"
-            cursor="pointer"
-            _hover={{ textDecoration: 'underline' }}
-          >
-            Посмотреть все
-          </Text>
         </HStack>
 
         <VStack gap={0}>
@@ -214,6 +207,9 @@ export function MobileHomePage({ onSearch }: { onSearch?: (query: string) => voi
           )}
         </VStack>
       </Box>
+
+      {/* Кнопка прокрутки вверх */}
+      <ScrollToTopButton />
     </MotionBox>
   );
 }

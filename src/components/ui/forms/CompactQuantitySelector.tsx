@@ -36,7 +36,10 @@ export function CompactQuantitySelector({ dish, quantity, onQuantityChange }: Co
     >
       <Box
         as="button"
-        onClick={quantity === 0 ? undefined : handleDecrement}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (quantity > 0) handleDecrement();
+        }}
         w="24px"
         h="24px"
         bg="var(--gray-100)"
@@ -65,7 +68,11 @@ export function CompactQuantitySelector({ dish, quantity, onQuantityChange }: Co
 
       <Box
         as="button"
-        onClick={handleIncrement}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleIncrement();
+        }}
+        cursor="pointer"
         w="24px"
         h="24px"
         bg="var(--gray-100)"

@@ -46,6 +46,7 @@ export function CategoryScroll({ categories, selectedCategory, onCategorySelect 
               transition={{ duration: 0.3, delay: index * 0.05 }}
               as="button"
               onClick={() => onCategorySelect?.(category.id)}
+              cursor="pointer"
               minW={itemWidth}
               p="var(--space-3)"
               borderRadius="var(--radius-lg)"

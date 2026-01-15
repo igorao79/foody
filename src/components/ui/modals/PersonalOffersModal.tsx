@@ -90,7 +90,7 @@ export function PersonalOffersModal({ isOpen, onClose, offers }: PersonalOffersM
                 </Text>
               </VStack>
             </HStack>
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={onClose} cursor="pointer">
               <Icon as={FiX} boxSize={5} />
             </Button>
           </HStack>
@@ -108,6 +108,7 @@ export function PersonalOffersModal({ isOpen, onClose, offers }: PersonalOffersM
                 <Box
                   as="button"
                   onClick={() => handleOfferClick(offer.id)}
+                  cursor="pointer"
                   p="var(--space-4)"
                   borderRadius="var(--radius-lg)"
                   bg="var(--gray-50)"

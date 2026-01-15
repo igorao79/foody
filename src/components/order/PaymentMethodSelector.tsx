@@ -23,6 +23,7 @@ export function PaymentMethodSelector({ selectedMethod, onMethodSelect }: Paymen
         <MotionBox
           as="button"
           onClick={() => onMethodSelect('card')}
+          cursor="pointer"
           p="var(--space-4)"
           borderRadius="var(--radius-lg)"
           border={selectedMethod === 'card' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
@@ -51,6 +52,7 @@ export function PaymentMethodSelector({ selectedMethod, onMethodSelect }: Paymen
         <MotionBox
           as="button"
           onClick={() => onMethodSelect('cash')}
+          cursor="pointer"
           p="var(--space-4)"
           borderRadius="var(--radius-lg)"
           border={selectedMethod === 'cash' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}

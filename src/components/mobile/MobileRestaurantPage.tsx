@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Header } from '@/components/ui/navigation/Header';
 import { RestaurantHeader } from '@/components/restaurant/RestaurantHeader';
 import { MenuTabs } from '@/components/restaurant/MenuTabs';
+import { ScrollToTopButton } from '@/components/ui/ScrollToTopButton';
 import { restaurants, dishes } from '@/utils/mockData';
 
 const MotionBox = motion(Box);
@@ -51,6 +52,9 @@ export function MobileRestaurantPage() {
       <MenuTabs
         dishes={restaurantDishes}
       />
+
+      {/* Кнопка прокрутки вверх */}
+      <ScrollToTopButton />
     </MotionBox>
   );
 }

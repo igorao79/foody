@@ -9,6 +9,8 @@ import { RestaurantCard } from '@/components/ui/cards/RestaurantCard';
 import { PromoCarousel } from '@/components/ui/carousel/PromoCarousel';
 import { DesktopHeader } from './DesktopHeader';
 import { Footer } from '@/components/layout/Footer';
+import { SupportChatWidget } from '@/components/ui/SupportChatWidget';
+import { SupportChatModal } from '@/components/ui/modals/SupportChatModal';
 import { categories, restaurants, dishes } from '@/utils/mockData';
 import { Restaurant, Dish } from '@/types';
 import { useCart } from '@/contexts/CartContext';
@@ -23,6 +25,7 @@ export function DesktopHomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchResults, setSearchResults] = useState<Array<{type: 'restaurant' | 'dish', restaurant: Restaurant, dish?: Dish}>>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleRestaurantClick = (restaurantId: string) => {
     router.push(`/restaurant/${restaurantId}`);
@@ -222,14 +225,6 @@ export function DesktopHomePage() {
                       </Text>
                     )}
                   </VStack>
-                  <Text
-                    fontSize="var(--font-base)"
-                    color="var(--accent)"
-                    cursor="pointer"
-                    _hover={{ textDecoration: 'underline' }}
-                  >
-                    Посмотреть все
-                  </Text>
                 </HStack>
 
                 <Grid templateColumns="repeat(auto-fill, minmax(350px, 1fr))" gap="var(--space-4)">
@@ -422,6 +417,15 @@ export function DesktopHomePage() {
         </Grid>
       </Container>
       <Footer />
+
+      {/* Виджет поддержки */}
+      <SupportChatWidget onChatOpen={() => setIsChatOpen(true)} />
+
+      {/* Чат поддержки */}
+      <SupportChatModal
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+      />
     </MotionBox>
   );
 }
