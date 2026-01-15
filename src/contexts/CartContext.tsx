@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { CartItem, Cart, Dish, DishSize, DishAddon } from '@/types';
 import { promoCodes, PromoCode } from '@/utils/mockData';
+import { useAuth } from './AuthContext';
 
 type CartState = Cart;
 
@@ -266,6 +267,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [cart, dispatch] = useReducer(cartReducer, initialState);
 
   // Пересчитываем deliveryFee при изменении items или discount
@@ -286,6 +288,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart]);
 
   const addItem = (dish: Dish, quantity: number, selectedSize?: DishSize, selectedAddons?: DishAddon[]) => {
+    // Проверяем авторизацию
+    if (!user?.isLoggedIn) {
+      // Перенаправляем на страницу логина
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+      return;
+    }
+
     dispatch({ type: 'ADD_ITEM', payload: { dish, quantity, selectedSize, selectedAddons } });
   };
 

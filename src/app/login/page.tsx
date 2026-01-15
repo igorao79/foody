@@ -57,8 +57,16 @@ export default function LoginPage() {
         </Layout>
       )}
 
-      <Box pt={isDesktop ? "120px" : "0"} minH="100vh" bg="var(--background)" py="var(--space-6)">
-        <Box maxW="400px" mx="auto" px="var(--space-4)">
+      <Box
+        pt={isDesktop ? "120px" : "0"}
+        minH="100vh"
+        bg="var(--background)"
+        py="var(--space-6)"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Box maxW="400px" w="100%" px="var(--space-4)">
           <MotionBox
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -123,7 +131,6 @@ export default function LoginPage() {
                     loading={isSubmitting}
                     loadingText="Вход..."
                     bg="var(--primary)"
-                    _hover={{ bg: 'var(--primary-dark)' }}
                   >
                     Войти
                   </Button>

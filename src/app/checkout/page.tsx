@@ -83,10 +83,8 @@ export default function CheckoutPage() {
           return prev + 1;
         } else {
           clearInterval(progressInterval);
-          // Убираем редирект, оставляем модалку открытой
-          setTimeout(() => {
-            clearCart();
-          }, 1000);
+          // Очищаем корзину сразу после завершения заказа
+          clearCart();
           return prev;
         }
       });
