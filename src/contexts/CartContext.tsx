@@ -43,20 +43,24 @@ function loadCartFromStorage(): CartState {
   try {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
+      console.log('Loading cart from localStorage:', savedCart);
       const parsedCart = JSON.parse(savedCart);
       // Пересчитываем deliveryFee на основе уникальных ресторанов
       const deliveryFee = calculateDeliveryFee(parsedCart.items || []);
       const itemsTotal = parsedCart.items?.reduce((sum: number, item: CartItem) => sum + item.totalPrice, 0) || 0;
-      return {
+      const result = {
         ...parsedCart,
         deliveryFee,
         total: itemsTotal + deliveryFee - parsedCart.discount,
       };
+      console.log('Loaded cart result:', result);
+      return result;
     }
   } catch (error) {
     console.error('Error loading cart from localStorage:', error);
   }
 
+  console.log('Returning empty cart');
   return {
     items: [],
     total: 0,
@@ -71,6 +75,7 @@ function saveCartToStorage(cart: CartState) {
   if (typeof window === 'undefined') return;
 
   try {
+    console.log('Saving cart to localStorage:', cart);
     localStorage.setItem('cart', JSON.stringify(cart));
   } catch (error) {
     console.error('Error saving cart to localStorage:', error);
@@ -214,6 +219,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     }
 
     case 'CLEAR_CART':
+      console.log('CartContext: CLEAR_CART action processed');
       return initialState;
 
     case 'APPLY_PROMO': {
@@ -321,6 +327,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCart = () => {
+    console.log('CartContext: clearCart called');
     dispatch({ type: 'CLEAR_CART' });
   };
 

@@ -84,7 +84,15 @@ export default function CheckoutPage() {
         } else {
           clearInterval(progressInterval);
           // Очищаем корзину сразу после завершения заказа
+          console.log('Очищаем корзину после успешного заказа');
+          console.log('Корзина перед очисткой:', cart);
           clearCart();
+          // Проверяем localStorage сразу после очистки
+          setTimeout(() => {
+            const savedCart = localStorage.getItem('cart');
+            console.log('localStorage после очистки:', savedCart);
+            console.log('Текущая корзина в состоянии:', cart);
+          }, 100);
           return prev;
         }
       });
