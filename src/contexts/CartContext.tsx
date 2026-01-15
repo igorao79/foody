@@ -12,7 +12,20 @@ type CartAction =
   | { type: 'REMOVE_ITEM'; payload: { id: string } }
   | { type: 'CLEAR_CART' }
   | { type: 'APPLY_PROMO'; payload: { code: string; discount: number } }
-  | { type: 'REMOVE_PROMO' };
+  | { type: 'REMOVE_PROMO' }
+  | { type: 'UPDATE_DELIVERY_FEE'; payload: { deliveryFee: number; total: number } };
+
+// Функция для расчета стоимости доставки на основе количества уникальных ресторанов
+function calculateDeliveryFee(items: CartItem[]): number {
+  if (items.length === 0) return 0;
+
+  // Получаем уникальные restaurantId из всех блюд в корзине
+  const uniqueRestaurants = new Set(items.map(item => item.dish.restaurantId));
+  const restaurantCount = uniqueRestaurants.size;
+
+  // Стоимость доставки за каждый ресторан - 150 рублей
+  return restaurantCount * 150;
+}
 
 // Функция для загрузки корзины из localStorage
 function loadCartFromStorage(): CartState {
@@ -20,7 +33,7 @@ function loadCartFromStorage(): CartState {
     return {
       items: [],
       total: 0,
-      deliveryFee: 150, // рубли
+      deliveryFee: 0,
       discount: 0,
       promoCode: undefined,
     };
@@ -30,11 +43,13 @@ function loadCartFromStorage(): CartState {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       const parsedCart = JSON.parse(savedCart);
-      // Пересчитываем общую сумму на случай изменений в логике расчета
+      // Пересчитываем deliveryFee на основе уникальных ресторанов
+      const deliveryFee = calculateDeliveryFee(parsedCart.items || []);
       const itemsTotal = parsedCart.items?.reduce((sum: number, item: CartItem) => sum + item.totalPrice, 0) || 0;
       return {
         ...parsedCart,
-        total: itemsTotal + parsedCart.deliveryFee - parsedCart.discount,
+        deliveryFee,
+        total: itemsTotal + deliveryFee - parsedCart.discount,
       };
     }
   } catch (error) {
@@ -44,7 +59,7 @@ function loadCartFromStorage(): CartState {
   return {
     items: [],
     total: 0,
-    deliveryFee: 150, // рубли
+    deliveryFee: 0,
     discount: 0,
     promoCode: undefined,
   };
@@ -122,6 +137,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
       const existingItemIndex = state.items.findIndex(item => item.id === itemId);
 
+      let newItems: CartItem[];
       if (existingItemIndex >= 0) {
         const updatedItems = [...state.items];
         const existingItem = updatedItems[existingItemIndex];
@@ -131,14 +147,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           quantity: newQuantity,
           totalPrice: calculateItemTotal(dish, newQuantity, selectedSize, selectedAddons),
         };
-
-        const newTotal = updatedItems.reduce((sum, item) => sum + item.totalPrice, 0);
-
-        return {
-          ...state,
-          items: updatedItems,
-          total: newTotal + state.deliveryFee - state.discount,
-        };
+        newItems = updatedItems;
       } else {
         const newItem: CartItem = {
           id: itemId,
@@ -148,16 +157,18 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           selectedAddons,
           totalPrice,
         };
-
-        const newItems = [...state.items, newItem];
-        const newTotal = newItems.reduce((sum, item) => sum + item.totalPrice, 0);
-
-        return {
-          ...state,
-          items: newItems,
-          total: newTotal + state.deliveryFee - state.discount,
-        };
+        newItems = [...state.items, newItem];
       }
+
+      const newTotal = newItems.reduce((sum, item) => sum + item.totalPrice, 0);
+      const newDeliveryFee = calculateDeliveryFee(newItems);
+
+      return {
+        ...state,
+        items: newItems,
+        deliveryFee: newDeliveryFee,
+        total: newTotal + newDeliveryFee - state.discount,
+      };
     }
 
     case 'UPDATE_ITEM': {
@@ -178,22 +189,26 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       );
 
       const newTotal = updatedItems.reduce((sum, item) => sum + item.totalPrice, 0);
+      const newDeliveryFee = calculateDeliveryFee(updatedItems);
 
       return {
         ...state,
         items: updatedItems,
-        total: newTotal + state.deliveryFee - state.discount,
+        deliveryFee: newDeliveryFee,
+        total: newTotal + newDeliveryFee - state.discount,
       };
     }
 
     case 'REMOVE_ITEM': {
       const filteredItems = state.items.filter(item => item.id !== action.payload.id);
       const newTotal = filteredItems.reduce((sum, item) => sum + item.totalPrice, 0);
+      const newDeliveryFee = calculateDeliveryFee(filteredItems);
 
       return {
         ...state,
         items: filteredItems,
-        total: newTotal + state.deliveryFee - state.discount,
+        deliveryFee: newDeliveryFee,
+        total: newTotal + newDeliveryFee - state.discount,
       };
     }
 
@@ -202,11 +217,12 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
     case 'APPLY_PROMO': {
       const { code, discount } = action.payload;
+      const itemsTotal = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
       return {
         ...state,
         promoCode: code,
         discount,
-        total: state.items.reduce((sum, item) => sum + item.totalPrice, 0) + state.deliveryFee - discount,
+        total: itemsTotal + state.deliveryFee - discount,
       };
     }
 
@@ -217,6 +233,15 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         promoCode: undefined,
         discount: 0,
         total: itemsTotal + state.deliveryFee,
+      };
+    }
+
+    case 'UPDATE_DELIVERY_FEE': {
+      const { deliveryFee, total } = action.payload;
+      return {
+        ...state,
+        deliveryFee,
+        total,
       };
     }
 
@@ -242,6 +267,18 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, dispatch] = useReducer(cartReducer, initialState);
+
+  // Пересчитываем deliveryFee при изменении items или discount
+  useEffect(() => {
+    const correctDeliveryFee = calculateDeliveryFee(cart.items);
+    if (cart.deliveryFee !== correctDeliveryFee) {
+      const itemsTotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+      dispatch({
+        type: 'UPDATE_DELIVERY_FEE',
+        payload: { deliveryFee: correctDeliveryFee, total: itemsTotal + correctDeliveryFee - cart.discount }
+      });
+    }
+  }, [cart.items, cart.deliveryFee, cart.discount]);
 
   // Сохраняем корзину в localStorage при каждом изменении
   useEffect(() => {

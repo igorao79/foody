@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Box, Text, HStack, Input, Button, VStack } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,25 +19,40 @@ export function PromoCodeInput({ currentPromo, onApplyPromo, onRemovePromo }: Pr
   const [isExpanded, setIsExpanded] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
+  // Очищаем уведомление при изменении currentPromo
+  React.useEffect(() => {
+    setNotification(null);
+  }, [currentPromo]);
+
   const handleApply = () => {
     if (promoCode.trim()) {
       const result = onApplyPromo(promoCode.trim());
-      setPromoCode('');
-      setIsExpanded(false);
 
       if (result.success) {
+        // Показываем уведомление перед очисткой состояния
         setNotification({ type: 'success', message: 'Промокод успешно применён!' });
-      } else {
-        setNotification({ type: 'error', message: result.error || 'Ошибка применения промокода' });
-      }
 
-      // Скрываем уведомление через 3 секунды
-      setTimeout(() => setNotification(null), 3000);
+        // Небольшая задержка перед очисткой состояния, чтобы уведомление успело отобразиться
+        setTimeout(() => {
+          setPromoCode('');
+          setIsExpanded(false);
+          // Скрываем уведомление через 2.5 секунды после очистки состояния
+          setTimeout(() => setNotification(null), 2500);
+        }, 100);
+      } else {
+        setPromoCode('');
+        setIsExpanded(false);
+        setNotification({ type: 'error', message: result.error || 'Ошибка применения промокода' });
+        // Скрываем уведомление через 3 секунды
+        setTimeout(() => setNotification(null), 3000);
+      }
     }
   };
 
   const handleRemove = () => {
     onRemovePromo();
+    setNotification({ type: 'success', message: 'Промокод удалён' });
+    setTimeout(() => setNotification(null), 2000);
   };
 
   if (currentPromo) {

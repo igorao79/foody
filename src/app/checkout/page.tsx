@@ -17,25 +17,21 @@ export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
   const { orderType } = useOrder();
 
-  // Debug logging
-  useEffect(() => {
-    console.log('CheckoutPage orderType changed:', orderType);
-  }, [orderType]);
+  // Получаем все уникальные адреса ресторанов из корзины для pickup
+  const getPickupAddresses = () => {
+    if (cart.items.length === 0) return ['Адрес ресторана'];
 
-  // Находим адрес ресторана с наибольшим количеством товаров для pickup
-  const getPickupAddress = () => {
-    if (cart.items.length === 0) return 'Адрес ресторана';
+    const uniqueRestaurantIds = new Set(cart.items.map(item => item.dish.restaurantId));
+    const addresses: string[] = [];
 
-    const restaurantCounts: { [key: string]: number } = {};
-    cart.items.forEach(item => {
-      restaurantCounts[item.dish.restaurantId] = (restaurantCounts[item.dish.restaurantId] || 0) + item.quantity;
+    uniqueRestaurantIds.forEach(restaurantId => {
+      const restaurant = restaurants.find(r => r.id === restaurantId);
+      if (restaurant?.address) {
+        addresses.push(restaurant.address);
+      }
     });
 
-    const mainRestaurantId = Object.entries(restaurantCounts)
-      .sort(([,a], [,b]) => b - a)[0]?.[0];
-
-    const restaurant = restaurants.find(r => r.id === mainRestaurantId);
-    return restaurant?.address || 'Адрес ресторана';
+    return addresses.length > 0 ? addresses : ['Адрес ресторана'];
   };
 
   const [selectedAddress, setSelectedAddress] = useState('Ленинский проспект, 1');
@@ -44,6 +40,19 @@ export default function CheckoutPage() {
   const [comment, setComment] = useState('');
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+
+  // Сбрасываем delivery-состояния при переключении на самовывоз
+  useEffect(() => {
+    if (orderType === 'pickup') {
+      setDeliveryTime('asap');
+      setSelectedAddress('');
+    }
+  }, [orderType]);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('CheckoutPage orderType changed:', orderType);
+  }, [orderType]);
 
   const deliverySteps = [
     { label: 'Заказ передан в ресторан', icon: FiShoppingBag },
@@ -116,6 +125,7 @@ export default function CheckoutPage() {
           <VStack align="stretch" gap="var(--space-6)">
             {/* Форма с белым фоном */}
             <Box
+              key={orderType}
               bg="var(--white)"
               borderRadius="var(--radius-lg)"
               p="var(--space-6)"
@@ -247,11 +257,18 @@ export default function CheckoutPage() {
                     <Text fontSize="var(--font-base)" color="var(--gray-600)">
                       {orderType === 'delivery' ? 'Доставка' : 'Самовывоз'}
                     </Text>
-                    {orderType === 'pickup' && (
-                      <Text fontSize="var(--font-sm)" color="var(--primary)">
-                        Адрес: {getPickupAddress()}
-                      </Text>
-                    )}
+                    {orderType === 'pickup' && (() => {
+                      const pickupAddresses = getPickupAddresses();
+                      return (
+                        <VStack align="flex-start" gap="var(--space-1)">
+                          {pickupAddresses.map((address, index) => (
+                            <Text key={address} fontSize="var(--font-sm)" color="var(--primary)">
+                              Адрес {pickupAddresses.length > 1 ? `${index + 1}: ` : ''}{address}
+                            </Text>
+                          ))}
+                        </VStack>
+                      );
+                    })()}
                   </VStack>
                   {orderType === 'delivery' && (
                     <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">

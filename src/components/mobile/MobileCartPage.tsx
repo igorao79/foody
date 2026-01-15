@@ -19,18 +19,21 @@ export function MobileCartPage() {
   const { cart, updateItem, removeItem, applyPromo, removePromo } = useCart();
   const { orderType } = useOrder();
 
-  // Находим адрес ресторана с наибольшим количеством товаров для pickup
-  const getPickupAddress = () => {
-    const restaurantCounts: { [key: string]: number } = {};
-    cart.items.forEach(item => {
-      restaurantCounts[item.dish.restaurantId] = (restaurantCounts[item.dish.restaurantId] || 0) + item.quantity;
+  // Получаем все уникальные адреса ресторанов из корзины для pickup
+  const getPickupAddresses = () => {
+    if (cart.items.length === 0) return ['Адрес ресторана'];
+
+    const uniqueRestaurantIds = new Set(cart.items.map(item => item.dish.restaurantId));
+    const addresses: string[] = [];
+
+    uniqueRestaurantIds.forEach(restaurantId => {
+      const restaurant = restaurants.find(r => r.id === restaurantId);
+      if (restaurant?.address) {
+        addresses.push(restaurant.address);
+      }
     });
 
-    const mainRestaurantId = Object.entries(restaurantCounts)
-      .sort(([,a], [,b]) => b - a)[0]?.[0];
-
-    const restaurant = restaurants.find(r => r.id === mainRestaurantId);
-    return restaurant?.address || 'Адрес ресторана';
+    return addresses.length > 0 ? addresses : ['Адрес ресторана'];
   };
 
   const handleCheckout = () => {
@@ -190,11 +193,18 @@ export function MobileCartPage() {
                   <Text fontSize="var(--font-base)" color="var(--gray-600)">
                     {orderType === 'delivery' ? 'Доставка' : 'Самовывоз'}
                   </Text>
-                  {orderType === 'pickup' && (
-                    <Text fontSize="var(--font-sm)" color="var(--primary)">
-                      Адрес: {getPickupAddress()}
-                    </Text>
-                  )}
+                  {orderType === 'pickup' && (() => {
+                    const pickupAddresses = getPickupAddresses();
+                    return (
+                      <VStack align="flex-start" gap="var(--space-1)">
+                        {pickupAddresses.map((address, index) => (
+                          <Text key={address} fontSize="var(--font-sm)" color="var(--primary)">
+                            Адрес {pickupAddresses.length > 1 ? `${index + 1}: ` : ''}{address}
+                          </Text>
+                        ))}
+                      </VStack>
+                    );
+                  })()}
                 </VStack>
                 {orderType === 'delivery' && (
                   <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
