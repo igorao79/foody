@@ -62,7 +62,7 @@ export function MobileCartPage() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <Header title="Корзина" showBackButton />
+        <Header title="Корзина" showBackButton showSearch={true} />
 
         <VStack
           gap="var(--space-4)"
@@ -185,25 +185,23 @@ export function MobileCartPage() {
                 </Text>
               </HStack>
 
-              {orderType === 'delivery' ? (
-                <HStack justify="space-between">
+              <HStack justify="space-between" minH="40px">
+                <VStack align="flex-start" gap="var(--space-1)" flex={1}>
                   <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                    Доставка
+                    {orderType === 'delivery' ? 'Доставка' : 'Самовывоз'}
                   </Text>
+                  {orderType === 'pickup' && (
+                    <Text fontSize="var(--font-sm)" color="var(--primary)">
+                      Адрес: {getPickupAddress()}
+                    </Text>
+                  )}
+                </VStack>
+                {orderType === 'delivery' && (
                   <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
                     {cart.deliveryFee}₽
                   </Text>
-                </HStack>
-              ) : (
-                <VStack align="flex-start" gap="var(--space-1)">
-                  <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                    Самовывоз
-                  </Text>
-                  <Text fontSize="var(--font-sm)" color="var(--primary)">
-                    Адрес: {getPickupAddress()}
-                  </Text>
-                </VStack>
-              )}
+                )}
+              </HStack>
 
               {cart.discount > 0 && (
                 <HStack justify="space-between">
@@ -256,7 +254,7 @@ export function MobileCartPage() {
           _active={{ bg: 'var(--secondary)' }}
           onClick={handleCheckout}
         >
-          Оформить заказ • {cart.total}₽
+          Оформить заказ • {cart.items.reduce((sum, item) => sum + item.totalPrice, 0) + (orderType === 'delivery' ? cart.deliveryFee : 0) - cart.discount}₽
         </Button>
       </Box>
     </MotionBox>

@@ -2,7 +2,6 @@
 
 import { Provider } from '@/components/ui/layout/provider';
 import { CartProvider } from '@/contexts/CartContext';
-import { LoadingProvider } from '@/contexts/LoadingContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { OrderProvider } from '@/contexts/OrderContext';
 import { useState } from 'react';
@@ -34,11 +33,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <OrderProvider>
         <AuthProvider>
           <CartProvider>
-            <LoadingProvider>
               <GlobalBackground />
               <GlobalSupport />
               {children}
-            </LoadingProvider>
           </CartProvider>
         </AuthProvider>
       </OrderProvider>

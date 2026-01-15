@@ -1,14 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
-import { FiSearch, FiUser, FiShoppingBag, FiTruck, FiHome, FiMapPin } from 'react-icons/fi';
+import { useState, useRef, useEffect } from 'react';
+import { Box, HStack, VStack, Text, Input, Icon, IconButton } from '@chakra-ui/react';
+import { FiSearch, FiUser, FiShoppingBag, FiTruck, FiHome, FiMapPin, FiPlus, FiMinus } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const MotionBox = motion(Box);
 import { useCart } from '@/contexts/CartContext';
 import { useOrder } from '@/contexts/OrderContext';
 import { useMounted } from '@/hooks/useMounted';
-import { Dish } from '@/types';
+import { Dish, Restaurant } from '@/types';
+import { restaurants, dishes } from '@/utils/mockData';
+import { DishPreviewModal } from '@/components/ui/modals/DishPreviewModal';
 
 interface DesktopHeaderProps {
   onSearch?: (query: string) => void;
@@ -20,10 +25,15 @@ interface DesktopHeaderProps {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function DesktopHeader({ onSearch, onDishClick, showOrderType = true }: DesktopHeaderProps) {
   const router = useRouter();
-  const { getItemCount } = useCart();
+  const { getItemCount, addItem, removeItemByDishId, getItemQuantity } = useCart();
   const { orderType, setOrderType } = useOrder();
   const mounted = useMounted();
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Array<{type: 'restaurant' | 'dish', restaurant: Restaurant, dish?: Dish}>>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [isDishModalOpen, setIsDishModalOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const itemCount = mounted ? getItemCount() : 0;
   const displayCount = itemCount > 10 ? '10+' : itemCount.toString();
@@ -31,8 +41,86 @@ export function DesktopHeader({ onSearch, onDishClick, showOrderType = true }: D
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    onSearch?.(query);
+
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    const lowerQuery = query.toLowerCase().trim();
+
+    // Поиск по ресторанам
+    const matchingRestaurants = restaurants.filter(restaurant =>
+      restaurant.name.toLowerCase().includes(lowerQuery) ||
+      restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
+      (restaurant.tags && restaurant.tags.some(tag => tag.toLowerCase().includes(lowerQuery)))
+    );
+
+    // Поиск по блюдам
+    const matchingDishes = dishes.filter(dish =>
+      dish.name.toLowerCase().includes(lowerQuery) ||
+      dish.description.toLowerCase().includes(lowerQuery) ||
+      dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
+      dish.category.toLowerCase().includes(lowerQuery)
+    );
+
+    // Формируем результаты поиска
+    const allResults: Array<{type: 'restaurant' | 'dish', restaurant: Restaurant, dish?: Dish}> = [
+      ...matchingRestaurants.map(restaurant => ({ type: 'restaurant' as const, restaurant })),
+      ...matchingDishes.map(dish => {
+        const restaurant = restaurants.find(r => r.id === dish.restaurantId)!;
+        return { type: 'dish' as const, restaurant, dish };
+      })
+    ];
+
+    setSearchResults(allResults.slice(0, 8)); // Ограничиваем до 8 результатов
+    setShowSearchDropdown(allResults.length > 0);
   };
+
+  const handleRestaurantClick = (restaurantId: string) => {
+    router.push(`/restaurant/${restaurantId}`);
+    setShowSearchDropdown(false);
+    setSearchQuery('');
+  };
+
+  const handleDishClick = (dish: Dish) => {
+    setSelectedDish(dish);
+    setIsDishModalOpen(true);
+    setShowSearchDropdown(false);
+  };
+
+  const handleAddDish = (dish: Dish) => {
+    addItem(dish, 1);
+    setShowSearchDropdown(false);
+  };
+
+  const handleRemoveDish = (dish: Dish) => {
+    const currentQuantity = getItemQuantity(dish.id);
+    if (currentQuantity > 0) {
+      // Используем removeItemByDishId для уменьшения количества
+      removeItemByDishId(dish.id);
+    }
+    setShowSearchDropdown(false);
+  };
+
+  // Закрытие dropdown при клике вне него
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+
+    if (showSearchDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSearchDropdown]);
+
 
   const handleUserClick = () => {
     router.push('/profile');
@@ -223,6 +311,143 @@ export function DesktopHeader({ onSearch, onDishClick, showOrderType = true }: D
               >
                 <FiSearch size={20} />
               </Box>
+
+              {/* Dropdown с результатами поиска */}
+              <AnimatePresence>
+                {showSearchDropdown && searchResults.length > 0 && (
+                  <MotionBox
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    position="absolute"
+                    top="calc(100% + var(--space-2))"
+                    left={0}
+                    right={0}
+                    bg="var(--white)"
+                    borderRadius="var(--radius-lg)"
+                    boxShadow="var(--shadow-lg)"
+                    border="1px solid var(--gray-200)"
+                    zIndex={1000}
+                    maxH="400px"
+                    overflowY="auto"
+                    ref={dropdownRef}
+                  >
+                    <VStack align="stretch" gap={0}>
+                      {searchResults.map((result, index) => (
+                        <Box
+                          key={`${result.type}-${result.restaurant.id}-${result.dish?.id || ''}-${index}`}
+                          p="var(--space-3)"
+                          _hover={{ bg: 'var(--gray-50)' }}
+                          cursor="pointer"
+                          borderBottom={index < searchResults.length - 1 ? "1px solid var(--gray-100)" : "none"}
+                          onClick={() => result.type === 'restaurant'
+                            ? handleRestaurantClick(result.restaurant.id)
+                            : handleDishClick(result.dish!)
+                          }
+                        >
+                          <HStack gap="var(--space-3)" align="flex-start">
+                            <Box
+                              w="40px"
+                              h="40px"
+                              borderRadius="var(--radius-md)"
+                              overflow="hidden"
+                              flexShrink={0}
+                              position="relative"
+                            >
+                              <Image
+                                src={result.type === 'restaurant' ? result.restaurant.image : result.dish!.image}
+                                alt={result.type === 'restaurant' ? result.restaurant.name : result.dish!.name}
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                sizes="40px"
+                              />
+                            </Box>
+
+                            <VStack align="flex-start" gap="var(--space-1)" flex={1} minW={0}>
+                              <HStack justify="space-between" align="flex-start" w="100%">
+                                <Text
+                                  fontSize="var(--font-sm)"
+                                  fontWeight="var(--font-medium)"
+                                  color="var(--primary)"
+                                  wordBreak="break-word"
+                                >
+                                  {result.type === 'restaurant' ? result.restaurant.name : result.dish!.name}
+                                </Text>
+                                <Text fontSize="var(--font-xs)" color="var(--gray-500)">
+                                  {result.type === 'restaurant' ? 'Ресторан' : 'Блюдо'}
+                                </Text>
+                              </HStack>
+
+                              <Text fontSize="var(--font-xs)" color="var(--gray-600)">
+                                {result.type === 'restaurant'
+                                  ? `${result.restaurant.cuisines.join(' • ')} • ${result.restaurant.deliveryTime}`
+                                  : result.dish!.description
+                                }
+                              </Text>
+
+                              {result.type === 'dish' && (
+                                <HStack gap="var(--space-1)" align="center" mt="var(--space-1)">
+                                  <Text fontSize="var(--font-sm)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                                    {result.dish!.price}₽
+                                  </Text>
+                                  <HStack gap="var(--space-1)">
+                                    <IconButton
+                                      aria-label="Уменьшить количество"
+                                      size="xs"
+                                      variant="outline"
+                                      colorScheme="red"
+                                      borderRadius="var(--radius-full)"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRemoveDish(result.dish!);
+                                      }}
+                                    >
+                                      <FiMinus size={10} />
+                                    </IconButton>
+
+                                    {/* Счетчик количества */}
+                                    <Box
+                                      px="var(--space-2)"
+                                      py="var(--space-1)"
+                                      bg="var(--gray-50)"
+                                      borderRadius="var(--radius-md)"
+                                      minW="30px"
+                                      textAlign="center"
+                                    >
+                                      <Text
+                                        fontSize="var(--font-xs)"
+                                        fontWeight="var(--font-semibold)"
+                                        color="var(--primary)"
+                                      >
+                                        {getItemQuantity(result.dish!.id) || 0}
+                                      </Text>
+                                    </Box>
+
+                                    <IconButton
+                                      aria-label="Добавить в корзину"
+                                      size="xs"
+                                      variant="outline"
+                                      colorScheme="primary"
+                                      borderRadius="var(--radius-full)"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAddDish(result.dish!);
+                                      }}
+                                    >
+                                      <FiPlus size={10} />
+                                    </IconButton>
+                                  </HStack>
+                                </HStack>
+                              )}
+                            </VStack>
+                          </HStack>
+                        </Box>
+                      ))}
+                    </VStack>
+                  </MotionBox>
+                )}
+              </AnimatePresence>
             </Box>
           </Box>
 
@@ -286,6 +511,16 @@ export function DesktopHeader({ onSearch, onDishClick, showOrderType = true }: D
             </Box>
           </HStack>
         </HStack>
+
+        <DishPreviewModal
+          isOpen={isDishModalOpen}
+          onClose={() => {
+            setIsDishModalOpen(false);
+            setSelectedDish(null);
+          }}
+          dish={selectedDish}
+        />
+
       </Box>
     </Box>
   );

@@ -11,6 +11,7 @@ interface RatingProps {
   clickable?: boolean;
   onClick?: (e?: React.MouseEvent) => void;
   variant?: 'filled' | 'outline';
+  textColor?: string;
 }
 
 export function Rating({
@@ -19,7 +20,8 @@ export function Rating({
   showValue = true,
   clickable = false,
   onClick,
-  variant = 'filled'
+  variant = 'filled',
+  textColor
 }: RatingProps) {
   const sizeMap = {
     sm: 3,
@@ -57,7 +59,7 @@ export function Rating({
         fill="var(--accent)"
       />
       {showValue && (
-        <Text fontSize="var(--font-sm)" fontWeight="medium" color="var(--primary)">
+        <Text fontSize="var(--font-sm)" fontWeight="medium" color={textColor || "var(--primary)"}>
           {value.toFixed(1)}
         </Text>
       )}

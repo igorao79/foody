@@ -13,6 +13,7 @@ interface Offer {
   discount: string;
   icon: React.ElementType;
   color: string;
+  promoCode?: string;
 }
 
 const offers: Offer[] = [
@@ -22,7 +23,8 @@ const offers: Offer[] = [
     description: 'На все виды пиццы в ресторане "Итальянская кухня"',
     discount: '-20%',
     icon: FiPercent,
-    color: 'var(--accent)'
+    color: 'var(--accent)',
+    promoCode: 'PIZZA20'
   },
   {
     id: '2',
@@ -30,7 +32,8 @@ const offers: Offer[] = [
     description: 'При заказе от 1000₽',
     discount: 'Бесплатно',
     icon: FiGift,
-    color: 'var(--secondary)'
+    color: 'var(--secondary)',
+    promoCode: 'FREEDELIVERY'
   },
   {
     id: '3',
@@ -38,7 +41,8 @@ const offers: Offer[] = [
     description: 'Попробуйте новое блюдо со скидкой 15%',
     discount: '-15%',
     icon: FiStar,
-    color: 'var(--primary)'
+    color: 'var(--primary)',
+    promoCode: 'NEW15'
   },
   {
     id: '4',
@@ -46,7 +50,8 @@ const offers: Offer[] = [
     description: 'Доставим ваш заказ за 20 минут',
     discount: 'Быстрее',
     icon: FiZap,
-    color: 'var(--accent)'
+    color: 'var(--accent)',
+    promoCode: 'FASTDELIVERY'
   },
   {
     id: '5',
@@ -54,7 +59,8 @@ const offers: Offer[] = [
     description: 'Персональная скидка для постоянных клиентов',
     discount: '-25%',
     icon: FiStar,
-    color: 'var(--secondary)'
+    color: 'var(--secondary)',
+    promoCode: 'VIP25'
   }
 ];
 
@@ -102,7 +108,7 @@ export function PersonalOffersMarquee() {
             }}
             style={{
               display: 'flex',
-              gap: '32px',
+              gap: '24px',
               alignItems: 'center',
               whiteSpace: 'nowrap'
             }}
@@ -111,10 +117,11 @@ export function PersonalOffersMarquee() {
             {[...offers, ...offers, ...offers].map((offer, index) => (
               <HStack
                 key={`${offer.id}-${index}`}
-                gap="var(--space-2)"
+                gap="var(--space-1)"
                 color="var(--white)"
                 opacity={0.9}
                 flexShrink={0}
+                maxW="200px"
               >
                 <Icon as={offer.icon} boxSize={4} />
                 <Text fontSize="var(--font-sm)" fontWeight="var(--font-medium)">
@@ -124,9 +131,15 @@ export function PersonalOffersMarquee() {
                   bg="rgba(255,255,255,0.2)"
                   color="var(--white)"
                   borderRadius="var(--radius-sm)"
-                  fontSize="var(--font-xs)"
-                  px="var(--space-2)"
-                  py="var(--space-1)"
+                  fontSize="10px"
+                  px="6px"
+                  py="2px"
+                  maxW="45px"
+                  textAlign="center"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                  fontWeight="600"
                 >
                   {offer.discount}
                 </Badge>

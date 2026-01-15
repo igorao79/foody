@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Box, Text, VStack, HStack, Badge, AspectRatio, Icon } from '@chakra-ui/react';
-import { FiMapPin } from 'react-icons/fi';
+import { FiMapPin, FiClock, FiDollarSign } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Restaurant } from '@/types';
 import { Rating } from '../feedback/Rating';
 import { ReviewsModal } from '../modals/ReviewsModal';
 import { useOrder } from '@/contexts/OrderContext';
+import { useIsDesktop } from '@/hooks/useBreakpoint';
 
 const MotionBox = motion(Box);
 
@@ -20,6 +21,7 @@ interface RestaurantCardProps {
 export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
   const { orderType } = useOrder();
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+  const isDesktop = useIsDesktop();
 
   const handleRatingClick = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation(); // Предотвращаем всплытие события к карточке
@@ -55,6 +57,7 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
       bg={restaurant.isOpen ? "var(--white)" : "var(--gray-50)"}
       boxShadow="var(--shadow-sm)"
       opacity={restaurant.isOpen ? 1 : 0.6}
+      zIndex={10}
       whileHover={restaurant.isOpen ? { y: -4, boxShadow: 'var(--shadow-lg)' } : {}}
       whileTap={restaurant.isOpen ? { scale: 0.98 } : {}}
     >
@@ -123,24 +126,32 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
 
         <HStack justify="space-between" align="center">
           <HStack gap="var(--space-3)">
-            <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-              {restaurant.deliveryTime}
-            </Text>
+            <HStack gap="var(--space-1)" align="center">
+              <Icon as={FiClock} boxSize={3} color="var(--gray-600)" />
+              <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                {restaurant.deliveryTime}
+              </Text>
+            </HStack>
             <Text fontSize="var(--font-sm)" color="var(--gray-600)">
               •
             </Text>
-            {orderType === 'pickup' && restaurant.distance ? (
-              <HStack gap="var(--space-1)" align="center">
-                <Icon as={FiMapPin} boxSize={3} color="var(--gray-600)" />
-                <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-                  {formatDistance(restaurant.distance)}
-                </Text>
-              </HStack>
-            ) : (
-              <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-                {restaurant.deliveryFee}₽ доставка
-              </Text>
-            )}
+            <Box minH="20px" minW={isDesktop ? "200px" : "180px"}>
+              {orderType === 'pickup' && restaurant.distance ? (
+                <HStack gap="var(--space-1)" align="center" justify="flex-start">
+                  <Icon as={FiMapPin} boxSize={3} color="var(--gray-600)" />
+                  <Text fontSize="var(--font-sm)" color="var(--gray-600)" whiteSpace="nowrap">
+                    {formatDistance(restaurant.distance)}
+                  </Text>
+                </HStack>
+              ) : (
+                <HStack gap="var(--space-1)" align="center" justify="flex-start">
+                  <Icon as={FiDollarSign} boxSize={3} color="var(--gray-600)" />
+                  <Text fontSize="var(--font-sm)" color="var(--gray-600)" whiteSpace="nowrap">
+                    {restaurant.deliveryFee}₽ доставка
+                  </Text>
+                </HStack>
+              )}
+            </Box>
           </HStack>
         </HStack>
       </VStack>

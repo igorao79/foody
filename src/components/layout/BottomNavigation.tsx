@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { Box, Flex, Icon, Text } from '@chakra-ui/react';
-import { FiHome, FiSearch, FiShoppingBag, FiUser, FiHeart, FiLogIn } from 'react-icons/fi';
+import { FiHome, FiShoppingBag, FiUser, FiLogIn } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -15,7 +15,7 @@ export function BottomNavigation() {
 
   const navItems = [
     { id: 'home', label: 'Главная', icon: FiHome, path: '/' },
-    { id: 'orders', label: 'Заказы', icon: FiShoppingBag, path: '/orders' },
+    { id: 'cart', label: 'Корзина', icon: FiShoppingBag, path: '/cart' },
     { id: 'profile', label: user ? 'Профиль' : 'Вход', icon: user ? FiUser : FiLogIn, path: user ? '/profile' : '/login' },
   ];
 

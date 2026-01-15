@@ -283,25 +283,23 @@ export function CheckoutForm({ onBack }: CheckoutFormProps) {
                 </Text>
               </HStack>
 
-              {orderType === 'delivery' ? (
-                <HStack justify="space-between">
+              <HStack justify="space-between" minH="40px">
+                <VStack align="flex-start" gap="var(--space-1)" flex={1}>
                   <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                    Доставка
+                    {orderType === 'delivery' ? 'Доставка' : 'Самовывоз'}
                   </Text>
+                  {orderType === 'pickup' && (
+                    <Text fontSize="var(--font-sm)" color="var(--primary)">
+                      Адрес: {getPickupAddress()}
+                    </Text>
+                  )}
+                </VStack>
+                {orderType === 'delivery' && (
                   <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
                     {cart.deliveryFee}₽
                   </Text>
-                </HStack>
-              ) : (
-                <VStack align="flex-start" gap="var(--space-1)">
-                  <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                    Самовывоз
-                  </Text>
-                  <Text fontSize="var(--font-sm)" color="var(--primary)">
-                    Адрес: {getPickupAddress()}
-                  </Text>
-                </VStack>
-              )}
+                )}
+              </HStack>
 
               {cart.discount > 0 && (
                 <HStack justify="space-between">
@@ -415,7 +413,7 @@ export function CheckoutForm({ onBack }: CheckoutFormProps) {
                 </Text>
 
                 {/* Progress Steps */}
-                <Box position="relative" w="100%" maxW="300px" minH="300px">
+                <Box position="relative" w="100%" maxW="300px" maxH={orderType === 'pickup' ? "180px" : "260px"}>
                   {/* Чекпоинты */}
                   <Stack direction="column" gap={0} w="100%" align="stretch">
                     {steps.map((step, index) => (

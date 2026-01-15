@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Button, Container, Grid, GridItem, Icon, Input, NativeSelect, Textarea, Circle, Stack } from '@chakra-ui/react';
@@ -21,6 +21,11 @@ export function DesktopCartPage() {
   const { orderType } = useOrder();
 
   console.log('DesktopCartPage orderType:', orderType); // Debug
+
+  // Force re-render when orderType changes
+  useEffect(() => {
+    console.log('DesktopCartPage orderType changed to:', orderType, 'at', new Date().toISOString());
+  }, [orderType]);
 
   // Находим адрес ресторана с наибольшим количеством товаров для pickup
   const getPickupAddress = () => {
@@ -251,79 +256,87 @@ export function DesktopCartPage() {
           // Форма оформления заказа
           <Box maxW="600px" mx="auto" bg="var(--white)" p="var(--space-8)" borderRadius="var(--radius-xl)" boxShadow="var(--shadow-lg)">
             <VStack align="stretch" gap="var(--space-6)">
-              {/* Адрес доставки */}
-              <Box>
-                <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)" mb="var(--space-3)">
-                  Адрес доставки
-                </Text>
-                <Input
-                  value={selectedAddress}
-                  onChange={(e) => setSelectedAddress(e.target.value)}
-                  placeholder="Введите адрес доставки"
-                  bg="var(--gray-50)"
-                  border="1px solid var(--gray-200)"
-                  borderRadius="var(--radius-lg)"
-                  fontSize="var(--font-base)"
-                  _focus={{
-                    borderColor: 'var(--primary)',
-                    boxShadow: 'var(--shadow-sm)',
-                    bg: 'var(--white)'
-                  }}
-                />
-              </Box>
+              {orderType === 'delivery' && (
+                <>
+                  {/* Адрес доставки */}
+                  <Box>
+                    <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)" mb="var(--space-3)">
+                      Адрес доставки
+                    </Text>
+                    <Input
+                      value={selectedAddress}
+                      onChange={(e) => setSelectedAddress(e.target.value)}
+                      placeholder="Введите адрес доставки"
+                      bg="var(--gray-50)"
+                      border="1px solid var(--gray-200)"
+                      borderRadius="var(--radius-lg)"
+                      fontSize="var(--font-base)"
+                      _focus={{
+                        borderColor: 'var(--primary)',
+                        boxShadow: 'var(--shadow-sm)',
+                        bg: 'var(--white)'
+                      }}
+                    />
+                  </Box>
 
-              {/* Время доставки */}
-              <Box>
-                <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)" mb="var(--space-3)">
-                  Время доставки
-                </Text>
-                <NativeSelect.Root>
-                  <NativeSelect.Field
-                    value={deliveryTime}
-                    onChange={(e) => setDeliveryTime(e.target.value)}
-                    bg="var(--gray-50)"
-                    border="1px solid var(--gray-200)"
-                    borderRadius="var(--radius-lg)"
-                    fontSize="var(--font-base)"
-                    _focus={{
-                      borderColor: 'var(--primary)',
-                      boxShadow: 'var(--shadow-sm)',
-                      bg: 'var(--white)'
-                    }}
-                  >
-                    <option value="asap">Как можно скорее</option>
-                    <option value="30min">Через 30 минут</option>
-                    <option value="1hour">Через 1 час</option>
-                    <option value="2hours">Через 2 часа</option>
-                  </NativeSelect.Field>
-                </NativeSelect.Root>
-              </Box>
+                  {/* Время доставки */}
+                  <Box>
+                    <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)" mb="var(--space-3)">
+                      Время доставки
+                    </Text>
+                    <NativeSelect.Root>
+                      <NativeSelect.Field
+                        value={deliveryTime}
+                        onChange={(e) => setDeliveryTime(e.target.value)}
+                        bg="var(--gray-50)"
+                        border="1px solid var(--gray-200)"
+                        borderRadius="var(--radius-lg)"
+                        fontSize="var(--font-base)"
+                        _focus={{
+                          borderColor: 'var(--primary)',
+                          boxShadow: 'var(--shadow-sm)',
+                          bg: 'var(--white)'
+                        }}
+                      >
+                        <option value="asap">Как можно скорее</option>
+                        <option value="30min">Через 30 минут</option>
+                        <option value="1hour">Через 1 час</option>
+                        <option value="2hours">Через 2 часа</option>
+                      </NativeSelect.Field>
+                    </NativeSelect.Root>
+                  </Box>
+                </>
+              )}
 
-              {/* Способ оплаты */}
-              <Box>
-                <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)" mb="var(--space-3)">
-                  Способ оплаты
-                </Text>
-                <NativeSelect.Root>
-                  <NativeSelect.Field
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    bg="var(--gray-50)"
-                    border="1px solid var(--gray-200)"
-                    borderRadius="var(--radius-lg)"
-                    fontSize="var(--font-base)"
-                    _focus={{
-                      borderColor: 'var(--primary)',
-                      boxShadow: 'var(--shadow-sm)',
-                      bg: 'var(--white)'
-                    }}
-                  >
-                    <option value="card">Картой при получении</option>
-                    <option value="cash">Наличными при получении</option>
-                    <option value="online">Оплатить онлайн</option>
-                  </NativeSelect.Field>
-                </NativeSelect.Root>
-              </Box>
+              {orderType === 'delivery' && (
+                <>
+                  {/* Способ оплаты */}
+                  <Box>
+                  <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)" mb="var(--space-3)">
+                    Способ оплаты
+                  </Text>
+                  <NativeSelect.Root>
+                    <NativeSelect.Field
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      bg="var(--gray-50)"
+                      border="1px solid var(--gray-200)"
+                      borderRadius="var(--radius-lg)"
+                      fontSize="var(--font-base)"
+                      _focus={{
+                        borderColor: 'var(--primary)',
+                        boxShadow: 'var(--shadow-sm)',
+                        bg: 'var(--white)'
+                      }}
+                    >
+                      <option value="card">Картой при получении</option>
+                      <option value="cash">Наличными при получении</option>
+                      <option value="online">Оплатить онлайн</option>
+                    </NativeSelect.Field>
+                  </NativeSelect.Root>
+                </Box>
+                </>
+              )}
 
               {/* Комментарий */}
               <Box>
@@ -365,28 +378,23 @@ export function DesktopCartPage() {
                     </Text>
                   </HStack>
 
-                  {(() => {
-                    console.log('Rendering delivery/pickup block with orderType:', orderType);
-                    return orderType === 'delivery' ? (
-                      <HStack justify="space-between" key="delivery">
-                        <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                          Доставка
-                        </Text>
-                        <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
-                          {cart.deliveryFee}₽
-                        </Text>
-                      </HStack>
-                    ) : (
-                      <VStack align="flex-start" gap="var(--space-1)" key="pickup">
-                        <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                          Самовывоз
-                        </Text>
+                  <HStack justify="space-between" minH="40px" key={orderType}>
+                    <VStack align="flex-start" gap="var(--space-1)" flex={1}>
+                      <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                        {orderType === 'delivery' ? 'Доставка' : 'Самовывоз'}
+                      </Text>
+                      {orderType === 'pickup' && (
                         <Text fontSize="var(--font-sm)" color="var(--primary)">
                           Адрес: {getPickupAddress()}
                         </Text>
-                      </VStack>
-                    );
-                  })()}
+                      )}
+                    </VStack>
+                    {orderType === 'delivery' && (
+                      <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                        {cart.deliveryFee}₽
+                      </Text>
+                    )}
+                  </HStack>
 
                   {cart.discount > 0 && (
                     <HStack justify="space-between">
@@ -426,7 +434,7 @@ export function DesktopCartPage() {
                 disabled={!selectedAddress.trim()}
                 w="100%"
               >
-                {!selectedAddress.trim() ? 'Введите адрес доставки' : `Оформить заказ • ${cart.total}₽`}
+                {!selectedAddress.trim() ? 'Введите адрес доставки' : `Оформить заказ • ${cart.items.reduce((sum, item) => sum + item.totalPrice, 0) + (orderType === 'delivery' ? cart.deliveryFee : 0) - cart.discount}₽`}
               </Button>
             </VStack>
           </Box>
@@ -508,14 +516,27 @@ export function DesktopCartPage() {
                       </Text>
                     </HStack>
 
-                    <HStack justify="space-between">
-                      <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                        Доставка
-                      </Text>
-                      <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
-                        {cart.deliveryFee}₽
-                      </Text>
-                    </HStack>
+                    {orderType === 'delivery' ? (
+                      <HStack justify="space-between">
+                        <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                          Доставка
+                        </Text>
+                        <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                          {cart.deliveryFee}₽
+                        </Text>
+                      </HStack>
+                    ) : (
+                      <HStack justify="space-between">
+                        <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                          Самовывоз
+                        </Text>
+                        <VStack align="flex-end" gap="var(--space-1)">
+                          <Text fontSize="var(--font-sm)" color="var(--primary)" textAlign="right">
+                            Адрес: {getPickupAddress()}
+                          </Text>
+                        </VStack>
+                      </HStack>
+                    )}
 
                     {cart.discount > 0 && (
                       <HStack justify="space-between">
@@ -535,7 +556,7 @@ export function DesktopCartPage() {
                         Итого
                       </Text>
                       <Text fontSize="var(--font-xl)" fontWeight="var(--font-bold)" color="var(--primary)">
-                        {cart.total}₽
+                        {cart.items.reduce((sum, item) => sum + item.totalPrice, 0) + (orderType === 'delivery' ? cart.deliveryFee : 0) - cart.discount}₽
                       </Text>
                     </HStack>
                   </VStack>
@@ -556,7 +577,7 @@ export function DesktopCartPage() {
                   _active={{ bg: 'var(--secondary)' }}
                   onClick={handleCheckout}
                 >
-                  Оформить заказ • {cart.total}₽
+                  Оформить заказ • {cart.items.reduce((sum, item) => sum + item.totalPrice, 0) + (orderType === 'delivery' ? cart.deliveryFee : 0) - cart.discount}₽
                 </Button>
               </VStack>
             </Box>
@@ -622,7 +643,7 @@ export function DesktopCartPage() {
                 </Text>
 
                 {/* Progress Steps */}
-                <Box position="relative" w="100%" maxW="300px" minH="300px">
+                <Box position="relative" w="100%" maxW="300px" maxH={orderType === 'pickup' ? "180px" : "260px"}>
                   {/* Чекпоинты */}
                   <Stack direction="column" gap="0" w="100%" align="stretch">
                     {steps.map((step, index) => (

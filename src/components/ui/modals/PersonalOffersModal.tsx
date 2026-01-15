@@ -12,7 +12,7 @@ import {
   Button
 } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiGift, FiChevronRight, FiX } from 'react-icons/fi';
+import { FiGift, FiX, FiChevronRight } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
@@ -23,6 +23,7 @@ interface Offer {
   discount: string;
   icon: React.ElementType;
   color: string;
+  promoCode?: string;
 }
 
 interface PersonalOffersModalProps {
@@ -32,9 +33,36 @@ interface PersonalOffersModalProps {
 }
 
 export function PersonalOffersModal({ isOpen, onClose, offers }: PersonalOffersModalProps) {
-  const handleOfferClick = (offerId: string) => {
-    // В будущем можно добавить логику применения предложения
-    console.log('Offer clicked:', offerId);
+  const handleOfferClick = async (offer: Offer) => {
+    if (offer.promoCode) {
+      try {
+        await navigator.clipboard.writeText(offer.promoCode);
+        // Показываем зеленый popup вместо alert
+        const notification = document.createElement('div');
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '9999';
+        notification.style.backgroundColor = 'var(--success, #48BB78)';
+        notification.style.color = 'white';
+        notification.style.padding = '12px 16px';
+        notification.style.borderRadius = '8px';
+        notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        notification.style.fontSize = '14px';
+        notification.style.fontWeight = '500';
+        notification.innerHTML = `✓ Промокод "${offer.promoCode}" скопирован!`;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+          }
+        }, 3000);
+      } catch {
+        alert(`Не удалось скопировать промокод: ${offer.promoCode}`);
+      }
+    }
     onClose();
   };
 
@@ -65,129 +93,128 @@ export function PersonalOffersModal({ isOpen, onClose, offers }: PersonalOffersM
         display="flex"
         alignItems="center"
         justifyContent="center"
-      p="var(--space-4)"
-      onClick={onClose}
-    >
-      <Box
-        bg="var(--white)"
-        borderRadius="var(--radius-xl)"
-        maxW="500px"
-        w="100%"
-        maxH="80vh"
-        overflow="auto"
-        onClick={(e) => e.stopPropagation()}
+        onClick={onClose}
       >
-        <Box p="var(--space-6)" borderBottom="1px solid var(--gray-200)">
-          <HStack justify="space-between" align="center">
-            <HStack gap="var(--space-3)">
-              <Icon as={FiGift} boxSize={6} color="var(--primary)" />
-              <VStack align="flex-start" gap="0">
-                <Text fontSize="var(--font-xl)" fontWeight="var(--font-bold)" color="var(--primary)">
-                  Персональные предложения
-                </Text>
-                <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-                  Специально для вас
-                </Text>
-              </VStack>
-            </HStack>
-            <Button variant="ghost" size="sm" onClick={onClose} cursor="pointer">
-              <Icon as={FiX} boxSize={5} />
-            </Button>
-          </HStack>
-        </Box>
-
-        <Box p="var(--space-6)">
-          <VStack gap="var(--space-4)" align="stretch">
-            {offers.map((offer, index) => (
-              <MotionBox
-                key={offer.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.3 }}
-              >
-                <Box
-                  as="button"
-                  onClick={() => handleOfferClick(offer.id)}
-                  cursor="pointer"
-                  p="var(--space-4)"
-                  borderRadius="var(--radius-lg)"
-                  bg="var(--gray-50)"
-                  border="2px solid var(--gray-200)"
-                  _hover={{
-                    borderColor: offer.color,
-                    bg: `${offer.color}10`,
-                    transform: 'translateY(-2px)',
-                    boxShadow: 'var(--shadow-md)'
-                  }}
-                  transition="all 0.3s ease"
-                  textAlign="left"
-                  w="100%"
-                >
-                  <HStack gap="var(--space-4)" align="flex-start">
-                    <Box
-                      p="var(--space-3)"
-                      borderRadius="var(--radius-lg)"
-                      bg={offer.color}
-                      color="var(--white)"
-                      flexShrink={0}
-                    >
-                      <offer.icon size={24} />
-                    </Box>
-
-                    <VStack align="flex-start" flex={1} gap="var(--space-2)">
-                      <HStack justify="space-between" align="flex-start" w="100%">
-                        <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)">
-                          {offer.title}
-                        </Text>
-                        <Badge
-                          bg={offer.color}
-                          color="var(--white)"
-                          borderRadius="var(--radius-full)"
-                          px="var(--space-3)"
-                          py="var(--space-1)"
-                          fontSize="var(--font-sm)"
-                          fontWeight="var(--font-bold)"
-                        >
-                          {offer.discount}
-                        </Badge>
-                      </HStack>
-
-                      <Text fontSize="var(--font-sm)" color="var(--gray-600)" lineHeight="1.4">
-                        {offer.description}
-                      </Text>
-                    </VStack>
-
-                    <Icon as={FiChevronRight} boxSize={5} color="var(--gray-400)" />
-                  </HStack>
-                </Box>
-              </MotionBox>
-            ))}
-
-            <Box borderTop="1px solid var(--gray-200)" my="var(--space-4)" />
-
-            <VStack gap="var(--space-3)">
-              <Text fontSize="var(--font-base)" color="var(--gray-600)" textAlign="center">
-                Предложения обновляются ежедневно
-              </Text>
-              <Button
-                onClick={onClose}
-                variant="outline"
-                borderColor="var(--primary)"
-                color="var(--primary)"
-                borderRadius="var(--radius-lg)"
-                px="var(--space-6)"
-                _hover={{
-                  bg: 'var(--primary)',
-                  color: 'var(--white)'
-                }}
-              >
-                Понятно
+        <Box
+          bg="var(--white)"
+          borderRadius="var(--radius-xl)"
+          maxW="500px"
+          w="100%"
+          maxH="80vh"
+          overflow="auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Box p="var(--space-6)" borderBottom="1px solid var(--gray-200)">
+            <HStack justify="space-between" align="center">
+              <HStack gap="var(--space-3)">
+                <Icon as={FiGift} boxSize={6} color="var(--primary)" />
+                <VStack align="flex-start" gap="0">
+                  <Text fontSize="var(--font-xl)" fontWeight="var(--font-bold)" color="var(--primary)">
+                    Персональные предложения
+                  </Text>
+                  <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                    Специально для вас
+                  </Text>
+                </VStack>
+              </HStack>
+              <Button variant="ghost" size="sm" onClick={onClose} cursor="pointer">
+                <Icon as={FiX} boxSize={5} />
               </Button>
+            </HStack>
+          </Box>
+
+          <Box p="var(--space-6)">
+            <VStack gap="var(--space-4)" align="stretch">
+              {offers.map((offer, index) => (
+                <MotionBox
+                  key={offer.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.3 }}
+                >
+                  <Box
+                    as="button"
+                    onClick={() => handleOfferClick(offer)}
+                    cursor="pointer"
+                    p="var(--space-4)"
+                    borderRadius="var(--radius-lg)"
+                    bg="var(--gray-50)"
+                    border="2px solid var(--gray-200)"
+                    _hover={{
+                      borderColor: offer.color,
+                      bg: `${offer.color}10`,
+                      transform: 'translateY(-2px)',
+                      boxShadow: 'var(--shadow-md)'
+                    }}
+                    transition="all 0.3s ease"
+                    textAlign="left"
+                    w="100%"
+                  >
+                    <HStack gap="var(--space-4)" align="flex-start">
+                      <Box
+                        p="var(--space-3)"
+                        borderRadius="var(--radius-lg)"
+                        bg={offer.color}
+                        color="var(--white)"
+                        flexShrink={0}
+                      >
+                        <offer.icon size={24} />
+                      </Box>
+
+                      <VStack align="flex-start" flex={1} gap="var(--space-2)">
+                        <HStack justify="space-between" align="flex-start" w="100%">
+                          <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                            {offer.title}
+                          </Text>
+                          <Badge
+                            bg={offer.color}
+                            color="var(--white)"
+                            borderRadius="var(--radius-full)"
+                            px="var(--space-3)"
+                            py="var(--space-1)"
+                            fontSize="var(--font-sm)"
+                            fontWeight="var(--font-bold)"
+                          >
+                            {offer.discount}
+                          </Badge>
+                        </HStack>
+
+                        <Text fontSize="var(--font-sm)" color="var(--gray-600)" lineHeight="1.4">
+                          {offer.description}
+                        </Text>
+                      </VStack>
+
+                      <Icon as={FiChevronRight} boxSize={5} color="var(--gray-400)" />
+                    </HStack>
+                  </Box>
+                </MotionBox>
+              ))}
+
+              <Box borderTop="1px solid var(--gray-200)" my="var(--space-4)" />
+
+              <VStack gap="var(--space-3)">
+                <Text fontSize="var(--font-base)" color="var(--gray-600)" textAlign="center">
+                  Предложения обновляются ежедневно
+                </Text>
+                <Button
+                  onClick={onClose}
+                  variant="outline"
+                  borderColor="var(--primary)"
+                  color="var(--primary)"
+                  borderRadius="var(--radius-lg)"
+                  px="var(--space-6)"
+                  _hover={{
+                    bg: 'var(--primary)',
+                    color: 'var(--white)'
+                  }}
+                >
+                  Понятно
+                </Button>
+              </VStack>
             </VStack>
-          </VStack>
+          </Box>
         </Box>
       </Box>
-    </Box>
     </AnimatePresence>,
     document.body
   );

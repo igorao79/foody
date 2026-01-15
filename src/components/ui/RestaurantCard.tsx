@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Box, Text, VStack, HStack, Badge, AspectRatio } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Badge, AspectRatio, Icon } from '@chakra-ui/react';
+import { FiClock, FiDollarSign } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Restaurant } from '@/types';
 import { Rating } from './feedback/Rating';
 import { ReviewsModal } from './modals/ReviewsModal';
+import { useIsDesktop } from '@/hooks/useBreakpoint';
 
 const MotionBox = motion(Box);
 
@@ -17,6 +19,7 @@ interface RestaurantCardProps {
 
 export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+  const isDesktop = useIsDesktop();
 
   const handleRatingClick = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation(); // Предотвращаем всплытие события к карточке
@@ -106,20 +109,27 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
             variant="outline"
             clickable
             onClick={handleRatingClick}
+            textColor={isDesktop ? undefined : "var(--white)"}
           />
         </HStack>
 
         <HStack justify="space-between" align="center">
           <HStack gap="var(--space-3)">
-            <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-              {restaurant.deliveryTime}
-            </Text>
+            <HStack gap="var(--space-1)" align="center">
+              <Icon as={FiClock} boxSize={3} color="var(--gray-600)" />
+              <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                {restaurant.deliveryTime}
+              </Text>
+            </HStack>
             <Text fontSize="var(--font-sm)" color="var(--gray-600)">
               •
             </Text>
-            <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-              {restaurant.deliveryFee}₽ доставка
-            </Text>
+            <HStack gap="var(--space-1)" align="center">
+              <Icon as={FiDollarSign} boxSize={3} color="var(--gray-600)" />
+              <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                {restaurant.deliveryFee}₽ доставка
+              </Text>
+            </HStack>
           </HStack>
         </HStack>
       </VStack>

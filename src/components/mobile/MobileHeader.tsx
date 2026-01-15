@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
 import { FiSearch, FiShoppingBag, FiTruck, FiHome, FiMinus, FiPlus } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useOrder } from '@/contexts/OrderContext';
@@ -18,15 +18,13 @@ const MotionBox = motion(Box);
 
 export function MobileHeader({ onSearch }: MobileHeaderProps) {
   const router = useRouter();
-  const { getItemCount, addItem, getItemQuantity, removeItemByDishId } = useCart();
+  const { addItem, getItemQuantity, removeItemByDishId } = useCart();
   const { orderType, setOrderType } = useOrder();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const itemCount = getItemCount();
-  const displayCount = itemCount > 10 ? '10+' : itemCount.toString();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -91,9 +89,6 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
     router.push(`/restaurant/${restaurantId}`);
   };
 
-  const handleCartClick = () => {
-    router.push('/cart');
-  };
 
   // Закрытие dropdown при клике вне него
   useEffect(() => {
@@ -167,6 +162,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
                   fontSize="var(--font-xs)"
                   color="var(--gray-600)"
                   lineHeight="1"
+                  whiteSpace="nowrap"
                 >
                   Быстрая доставка
                 </Text>
@@ -190,7 +186,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
             <Box
               position="absolute"
               top="var(--space-1)"
-              left={orderType === 'delivery' ? 'var(--space-1)' : 'calc(50% + var(--space-1))'}
+              left={orderType === 'delivery' ? 'var(--space-1)' : 'calc(47% + var(--space-1))'}
               w="calc(50% - var(--space-1))"
               h="calc(100% - var(--space-2))"
               bg="var(--primary)"
@@ -270,54 +266,6 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               <FiSearch size={16} />
             </Box>
           </Box>
-
-            <Box position="relative">
-              <Box
-                as="button"
-                aria-label="Корзина"
-                onClick={handleCartClick}
-                p="var(--space-3)"
-                border="2px solid var(--gray-200)"
-                borderRadius="var(--radius-lg)"
-                bg="transparent"
-                color="var(--primary)"
-                cursor="pointer"
-                _hover={{
-                  bg: 'var(--primary)',
-                  color: 'var(--white)',
-                  borderColor: 'var(--primary)',
-                }}
-                transition="all 0.2s ease"
-              >
-                <FiShoppingBag size={20} />
-              </Box>
-              <AnimatePresence>
-                {itemCount > 0 && (
-                  <MotionBox
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    position="absolute"
-                    top="-2px"
-                    right="-2px"
-                    bg="var(--primary)"
-                    color="var(--white)"
-                    borderRadius="var(--radius-full)"
-                    minW="18px"
-                    h="18px"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="var(--font-xs)"
-                    fontWeight="var(--font-bold)"
-                    px="var(--space-1)"
-                    boxShadow="0 2px 8px rgba(5, 56, 107, 0.3)"
-                  >
-                    {displayCount}
-                  </MotionBox>
-                )}
-              </AnimatePresence>
-            </Box>
         </HStack>
       </Box>
 

@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Box, Text, VStack, HStack, AspectRatio, Badge } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, AspectRatio, Badge, Icon } from '@chakra-ui/react';
+import { FiClock, FiDollarSign } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Restaurant } from '@/types';
 import { Rating } from '@/components/ui/feedback/Rating';
 import { ReviewsModal } from '@/components/ui/modals/ReviewsModal';
+import { useIsDesktop } from '@/hooks/useBreakpoint';
 
 const MotionBox = motion(Box);
 
@@ -16,6 +18,7 @@ interface RestaurantHeaderProps {
 
 export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+  const isDesktop = useIsDesktop();
 
   const handleRatingClick = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -92,17 +95,20 @@ export function RestaurantHeader({ restaurant }: RestaurantHeaderProps) {
               variant="outline"
               clickable
               onClick={handleRatingClick}
+              textColor={isDesktop ? undefined : "var(--white)"}
             />
           </HStack>
 
           <HStack gap="var(--space-4)">
-            <HStack gap="var(--space-1)">
-              <Text fontSize="var(--font-sm)" fontWeight="var(--font-medium)">
+            <HStack gap="var(--space-1)" align="center">
+              <Icon as={FiClock} boxSize={3} color="var(--white)" />
+              <Text fontSize="var(--font-sm)" fontWeight="var(--font-medium)" color="var(--white)">
                 {restaurant.deliveryTime}
               </Text>
             </HStack>
-            <HStack gap="var(--space-1)">
-              <Text fontSize="var(--font-sm)" fontWeight="var(--font-medium)">
+            <HStack gap="var(--space-1)" align="center">
+              <Icon as={FiDollarSign} boxSize={3} color="var(--white)" />
+              <Text fontSize="var(--font-sm)" fontWeight="var(--font-medium)" color="var(--white)">
                 {restaurant.deliveryFee}₽ доставка
               </Text>
             </HStack>

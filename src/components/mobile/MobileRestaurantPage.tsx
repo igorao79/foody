@@ -40,8 +40,6 @@ export function MobileRestaurantPage() {
       <Header
         showBackButton
         title={restaurant.name}
-        showFavorites
-        showShare
         showCart
       />
 

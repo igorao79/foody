@@ -41,6 +41,8 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
       bg="var(--white)"
       boxShadow="var(--shadow-sm)"
       border="1px solid var(--gray-100)"
+      position="relative"
+      zIndex={2}
     >
       {isDesktop ? (
         /* Desktop layout - все в одной строке */
@@ -66,14 +68,36 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
 
           {/* Информация о товаре */}
           <VStack align="flex-start" gap="var(--space-1)" flex={1}>
-            <Text
-              fontSize="var(--font-lg)"
-              fontWeight="var(--font-semibold)"
-              color="var(--primary)"
-              lineHeight="1.2"
-            >
-              {item.dish.name}
-            </Text>
+            <HStack justify="space-between" align="flex-start" w="100%">
+              <Text
+                fontSize="var(--font-lg)"
+                fontWeight="var(--font-semibold)"
+                color="var(--primary)"
+                lineHeight="1.2"
+              >
+                {item.dish.name}
+              </Text>
+
+              {/* Кнопка удаления в углу карточки */}
+              <IconButton
+                aria-label="Удалить из корзины"
+                onClick={() => onRemove(item.id)}
+                cursor="pointer"
+                size="sm"
+                variant="ghost"
+                color="var(--gray-500)"
+                position="absolute"
+                top="-30px"
+                right="-20px"
+                zIndex={3}
+                _hover={{
+                  bg: 'var(--red-50)',
+                  color: 'var(--red-500)',
+                }}
+              >
+                <FiTrash2 />
+              </IconButton>
+            </HStack>
 
             {/* Размер и дополнения */}
             <VStack align="flex-start" gap="var(--space-1)">
@@ -89,92 +113,75 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
               )}
             </VStack>
 
-            {/* Цена за единицу */}
-            <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-              {item.totalPrice / item.quantity}₽ × {item.quantity}
-            </Text>
-          </VStack>
+            {/* Управление количеством и цена */}
+            <HStack justify="space-between" align="center" w="100%" mt="var(--space-2)">
+              <HStack gap="var(--space-1)">
+                <IconButton
+                  aria-label="Уменьшить количество"
+                  onClick={handleDecrement}
+                  cursor="pointer"
+                  size="sm"
+                  variant="outline"
+                  borderColor="var(--gray-300)"
+                  color="var(--primary)"
+                  _hover={{
+                    bg: 'var(--primary)',
+                    color: 'var(--white)',
+                  }}
+                >
+                  <FiMinus />
+                </IconButton>
 
-          {/* Управление количеством и ценой */}
-          <VStack align="flex-end" gap="var(--space-2)">
-            <Text
-              fontSize="var(--font-lg)"
-              fontWeight="var(--font-bold)"
-              color="var(--primary)"
-            >
-              {item.totalPrice}₽
-            </Text>
+                <Box
+                  px="var(--space-3)"
+                  py="var(--space-1)"
+                  bg="var(--gray-50)"
+                  borderRadius="var(--radius-md)"
+                  minW="40px"
+                  textAlign="center"
+                >
+                  <Text
+                    fontSize="var(--font-base)"
+                    fontWeight="var(--font-semibold)"
+                    color="var(--primary)"
+                  >
+                    {item.quantity}
+                  </Text>
+                </Box>
 
-            <HStack gap="var(--space-1)">
-              <IconButton
-                aria-label="Уменьшить количество"
-                onClick={handleDecrement}
-                cursor="pointer"
-                size="sm"
-                variant="outline"
-                borderColor="var(--gray-300)"
-                color="var(--primary)"
-                _hover={{
-                  bg: 'var(--primary)',
-                  color: 'var(--white)',
-                }}
-              >
-                <FiMinus />
-              </IconButton>
+                <IconButton
+                  aria-label="Увеличить количество"
+                  onClick={handleIncrement}
+                  cursor="pointer"
+                  size="sm"
+                  variant="outline"
+                  borderColor="var(--gray-300)"
+                  color="var(--primary)"
+                  _hover={{
+                    bg: 'var(--primary)',
+                    color: 'var(--white)',
+                  }}
+                >
+                  <FiPlus />
+                </IconButton>
+              </HStack>
 
-              <Box
-                px="var(--space-3)"
-                py="var(--space-1)"
-                bg="var(--gray-50)"
-                borderRadius="var(--radius-md)"
-                minW="40px"
-                textAlign="center"
-              >
+              {/* Цена */}
+              <VStack align="flex-end" gap="var(--space-1)">
+                <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                  {item.totalPrice / item.quantity}₽ × {item.quantity}
+                </Text>
                 <Text
-                  fontSize="var(--font-base)"
-                  fontWeight="var(--font-semibold)"
+                  fontSize="var(--font-lg)"
+                  fontWeight="var(--font-bold)"
                   color="var(--primary)"
                 >
-                  {item.quantity}
+                  {item.totalPrice}₽
                 </Text>
-              </Box>
-
-              <IconButton
-                aria-label="Увеличить количество"
-                onClick={handleIncrement}
-                cursor="pointer"
-                size="sm"
-                variant="outline"
-                borderColor="var(--gray-300)"
-                color="var(--primary)"
-                _hover={{
-                  bg: 'var(--primary)',
-                  color: 'var(--white)',
-                }}
-              >
-                <FiPlus />
-              </IconButton>
+              </VStack>
             </HStack>
           </VStack>
 
-          {/* Кнопка удаления */}
-          <IconButton
-            aria-label="Удалить из корзины"
-            onClick={() => onRemove(item.id)}
-            cursor="pointer"
-            size="sm"
-            variant="ghost"
-            color="var(--gray-500)"
-            position="absolute"
-            top="var(--space-2)"
-            right="var(--space-2)"
-            _hover={{
-              color: 'var(--accent)',
-              bg: 'rgba(92, 219, 149, 0.1)',
-            }}
-          >
-            <FiTrash2 />
-          </IconButton>
         </HStack>
         </Box>
       ) : (
