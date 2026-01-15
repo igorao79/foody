@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Button, Icon, Divider } from '@chakra-ui/react';
 import { FiShoppingCart, FiMapPin } from 'react-icons/fi';

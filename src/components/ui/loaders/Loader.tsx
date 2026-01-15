@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Box, VStack, Text } from '@chakra-ui/react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion } from 'framer-motion';
 
 const MotionBox = motion(Box);
@@ -29,14 +28,7 @@ export function Loader({ message = 'Загрузка...' }: LoaderProps) {
       transition={{ duration: 0.3 }}
     >
       <VStack gap="var(--space-4)" align="center">
-        <Box w="120px" h="120px">
-          <DotLottieReact
-            src="/lotties/loader.lottie"
-            loop
-            autoplay
-            style={{ width: '100%', height: '100%' }}
-          />
-        </Box>
+        <Box as="span" className="custom-loader" />
         <Text
           fontSize="var(--font-lg)"
           fontWeight="var(--font-medium)"

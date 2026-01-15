@@ -70,46 +70,54 @@ const foodIcons = [
 
 // Функция для генерации фиксированного набора иконок
 const generateBackgroundIcons = () => {
-  const rows = 15;
-  const cols = 10;
   const iconsArray = [];
+  const totalIcons = 120; // 120 иконок для плотного покрытия
 
-  // Используем простой seed-based генератор для консистентности
-  let seed = 12345;
-  const random = () => {
-    seed = (seed * 9301 + 49297) % 233280;
-    return seed / 233280;
-  };
+  // Фиксированные значения для 100% консистентности
+  const fixedValues = [
+    0.3, 0.7, 0.2, 0.8, 0.1, 0.9, 0.4, 0.6, 0.5, 0.3,
+    0.7, 0.2, 0.8, 0.1, 0.9, 0.4, 0.6, 0.5, 0.3, 0.7,
+    0.2, 0.8, 0.1, 0.9, 0.4, 0.6, 0.5, 0.3, 0.7, 0.2,
+    0.8, 0.1, 0.9, 0.4, 0.6, 0.5, 0.3, 0.7, 0.2, 0.8,
+    0.1, 0.9, 0.4, 0.6, 0.5, 0.3, 0.7, 0.2, 0.8, 0.1,
+    0.9, 0.4, 0.6, 0.5, 0.3, 0.7, 0.2, 0.8, 0.1, 0.9
+  ];
 
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      // Рандомная иконка из массива
-      const randomIcon = foodIcons[Math.floor(random() * foodIcons.length)];
+  for (let i = 0; i < totalIcons; i++) {
+    // Детерминированная иконка на основе индекса
+    const iconIndex = Math.floor(fixedValues[i % fixedValues.length] * foodIcons.length);
+    const icon = foodIcons[Math.max(0, Math.min(foodIcons.length - 1, iconIndex))];
 
-      // Рандомный поворот
-      const rotation = random() * 360;
+    // Детерминированный поворот
+    const rotation = fixedValues[i % fixedValues.length] * 360;
 
-      // Рандомный размер (от 16px до 32px)
-      const size = 16 + random() * 16;
+    // Детерминированный размер (от 12px до 24px для мобильной адаптивности)
+    const size = 12 + fixedValues[i % fixedValues.length] * 12;
 
-      // Позиция по сетке с небольшим рандомным смещением
-      const baseX = (col * 100) / cols;
-      const baseY = (row * 100) / rows;
-      const offsetX = (random() - 0.5) * 8; // смещение ±4%
-      const offsetY = (random() - 0.5) * 8;
+    // Равномерное распределение по сетке 12x10
+    const cols = 12;
+    const rows = 10;
+    const col = i % cols;
+    const row = Math.floor(i / cols);
 
-      const x = Math.max(2, Math.min(98, baseX + offsetX)); // ограничиваем в пределах 2-98%
-      const y = Math.max(2, Math.min(98, baseY + offsetY));
+    const baseX = (col * 100) / cols;
+    const baseY = (row * 100) / rows;
 
-      iconsArray.push({
-        id: `icon-${row}-${col}`,
-        icon: randomIcon,
-        x,
-        y,
-        rotation,
-        size
-      });
-    }
+    // Маленькое смещение для естественности
+    const offsetX = (fixedValues[i % fixedValues.length] - 0.5) * 6;
+    const offsetY = (fixedValues[(i + 1) % fixedValues.length] - 0.5) * 6;
+
+    const x = Math.max(1, Math.min(99, baseX + offsetX));
+    const y = Math.max(1, Math.min(99, baseY + offsetY));
+
+    iconsArray.push({
+      id: `icon-${i}`,
+      icon,
+      x,
+      y,
+      rotation,
+      size
+    });
   }
 
   return iconsArray;
@@ -136,7 +144,7 @@ export function BackgroundIcons() {
           left={`${iconItem.x}%`}
           top={`${iconItem.y}%`}
           transform={`translate(-50%, -50%) rotate(${iconItem.rotation}deg)`}
-          opacity={0.1} // очень прозрачные
+          opacity={0.1} // очень прозрачные для мобильной адаптивности
           color="var(--secondary)"
         >
           <Icon as={iconItem.icon} boxSize={`${iconItem.size}px`} />

@@ -146,8 +146,13 @@ export function MenuTabs({ dishes }: MenuTabsProps) {
           return (
             <MotionBox
               key={dish.id}
-              as="button"
-              onClick={() => handleDishClick(dish)}
+              onClick={(e) => {
+                // Предотвращаем открытие модалки если клик был на кнопках количества
+                if ((e.target as HTMLElement).closest('[data-quantity-controls]')) {
+                  return;
+                }
+                handleDishClick(dish);
+              }}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               w="100%"
@@ -229,7 +234,7 @@ export function MenuTabs({ dishes }: MenuTabsProps) {
                     </HStack>
                   </VStack>
 
-                  <VStack align="center" gap="var(--space-1)" onClick={(e) => e.stopPropagation()}>
+                  <VStack align="center" gap="var(--space-1)" data-quantity-controls>
                     <Text
                       fontSize="var(--font-lg)"
                       fontWeight="var(--font-bold)"

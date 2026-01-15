@@ -2,26 +2,30 @@
 
 import { useState } from 'react';
 import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
-import { FiSearch, FiUser, FiShoppingBag, FiTruck, FiHome } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
+import { FiSearch, FiUser, FiShoppingBag, FiTruck, FiHome, FiMapPin } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
+import { useOrder } from '@/contexts/OrderContext';
+import { useMounted } from '@/hooks/useMounted';
+import { Dish } from '@/types';
 
 interface DesktopHeaderProps {
   onSearch?: (query: string) => void;
+  onDishClick?: (dish: Dish) => void;
   showOrderType?: boolean;
 }
 
-const MotionBox = motion(Box);
 
-export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function DesktopHeader({ onSearch, onDishClick, showOrderType = true }: DesktopHeaderProps) {
   const router = useRouter();
   const { getItemCount } = useCart();
+  const { orderType, setOrderType } = useOrder();
+  const mounted = useMounted();
   const [searchQuery, setSearchQuery] = useState('');
-  const [orderType, setOrderType] = useState('delivery');
 
-  const itemCount = getItemCount();
+  const itemCount = mounted ? getItemCount() : 0;
   const displayCount = itemCount > 10 ? '10+' : itemCount.toString();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,8 +128,8 @@ export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderP
                 <Box
                   position="absolute"
                   top="var(--space-1)"
-                  left={orderType === 'delivery' ? 'var(--space-1)' : 'calc(50%)'}
-                  w="calc(50% - var(--space-1))"
+                  left={orderType === 'delivery' ? 'var(--space-1)' : 'calc(47% - 4px)'}
+                  w={orderType === 'delivery' ? 'calc(45% - var(--space-1))' : 'calc(55% - var(--space-1))'}
                   h="calc(100% - var(--space-2))"
                   bg="var(--primary)"
                   borderRadius="var(--radius-md)"
@@ -170,6 +174,19 @@ export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderP
                 </HStack>
               </Box>
             )}
+
+            {/* Геолокация */}
+            <HStack
+              gap="var(--space-2)"
+              color="var(--gray-600)"
+              fontSize="var(--font-sm)"
+              cursor="pointer"
+              _hover={{ color: 'var(--primary)' }}
+              transition="color 0.2s ease"
+            >
+              <Icon as={FiMapPin} boxSize={4} />
+              <Text fontWeight="var(--font-medium)">Москва</Text>
+            </HStack>
           </HStack>
 
           {/* Центральная часть - Поиск */}
@@ -243,32 +260,27 @@ export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderP
               >
                 <FiShoppingBag size={20} />
               </Box>
-              <AnimatePresence>
-                {itemCount > 0 && (
-                  <MotionBox
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    position="absolute"
-                    top="-2px"
-                    right="-2px"
-                    bg="var(--primary)"
-                    color="var(--white)"
-                    borderRadius="var(--radius-full)"
-                    minW="18px"
-                    h="18px"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="var(--font-xs)"
-                    fontWeight="var(--font-bold)"
-                    px="var(--space-1)"
-                    boxShadow="0 2px 8px rgba(5, 56, 107, 0.3)"
-                  >
-                    {displayCount}
-                  </MotionBox>
-                )}
-              </AnimatePresence>
+              {mounted && itemCount > 0 && (
+                <Box
+                  position="absolute"
+                  top="-2px"
+                  right="-2px"
+                  bg="var(--primary)"
+                  color="var(--white)"
+                  borderRadius="var(--radius-full)"
+                  minW="18px"
+                  h="18px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  fontSize="var(--font-xs)"
+                  fontWeight="var(--font-bold)"
+                  px="var(--space-1)"
+                  boxShadow="0 2px 8px rgba(5, 56, 107, 0.3)"
+                >
+                  {displayCount}
+                </Box>
+              )}
             </Box>
           </HStack>
         </HStack>

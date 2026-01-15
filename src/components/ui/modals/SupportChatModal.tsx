@@ -10,7 +10,7 @@ import {
   Button,
   Icon,
 } from '@chakra-ui/react';
-import { FiSend, FiMinimize2 } from 'react-icons/fi';
+import { FiSend, FiMinimize2, FiHelpCircle } from 'react-icons/fi';
 
 interface Message {
   id: string;
@@ -150,7 +150,7 @@ export function SupportChatModal({ isOpen, onClose }: SupportChatModalProps) {
                   fontSize="var(--font-xs)"
                   flexShrink={0}
                 >
-                  🤖
+                  <Icon as={FiHelpCircle} boxSize={3} />
                 </Box>
               )}
 

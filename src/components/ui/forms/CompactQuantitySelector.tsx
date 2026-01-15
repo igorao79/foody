@@ -5,6 +5,7 @@ import { Box, Text, HStack } from '@chakra-ui/react';
 import { FiMinus, FiPlus } from 'react-icons/fi';
 import { useCart } from '@/contexts/CartContext';
 import { Dish } from '@/types';
+import { useMounted } from '@/hooks/useMounted';
 
 interface CompactQuantitySelectorProps {
   dish: Dish;
@@ -13,6 +14,7 @@ interface CompactQuantitySelectorProps {
 }
 
 export function CompactQuantitySelector({ dish, quantity, onQuantityChange }: CompactQuantitySelectorProps) {
+  const mounted = useMounted();
   const { addItem, removeItemByDishId } = useCart();
 
   const handleDecrement = () => {
@@ -26,6 +28,11 @@ export function CompactQuantitySelector({ dish, quantity, onQuantityChange }: Co
     addItem(dish, 1);
     onQuantityChange(quantity + 1);
   };
+
+  // SSR-safe: показываем placeholder до монтирования
+  if (!mounted) {
+    return <Box w="56px" h="24px" />;
+  }
 
   return (
     <HStack

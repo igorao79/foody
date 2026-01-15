@@ -50,7 +50,7 @@ export default function LoginPage() {
   return (
     <>
       {isDesktop ? (
-        <DesktopHeader showOrderType={false} />
+        <DesktopHeader showOrderType={true} />
       ) : (
         <Layout showBottomNav={false}>
           <Header title="Вход" showBackButton />

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Text, Link, Icon, Container, Button } from '@chakra-ui/react';
 import { FiFacebook, FiInstagram, FiTwitter, FiMail, FiPhone, FiMapPin, FiSmartphone } from 'react-icons/fi';
+import { FaGooglePlay, FaAppStoreIos } from 'react-icons/fa';
 
 export function Footer() {
   return (
@@ -11,7 +12,7 @@ export function Footer() {
       color="var(--white)"
       mt="auto"
     >
-      <Container maxW="1200px" py="var(--space-8)">
+      <Container maxW="1200px" py="var(--space-12)">
         <VStack gap="var(--space-6)" align="stretch">
           {/* Основная информация */}
           <HStack
@@ -52,46 +53,6 @@ export function Footer() {
               </VStack>
             </VStack>
 
-            {/* Быстрые ссылки */}
-            <VStack align="flex-start" gap="var(--space-3)" flex={1} minW="150px">
-              <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)">
-                Ссылки
-              </Text>
-              <VStack align="flex-start" gap="var(--space-2)">
-                <Link
-                  fontSize="var(--font-sm)"
-                  opacity={0.9}
-                  _hover={{ opacity: 1, textDecoration: 'underline' }}
-                  href="/about"
-                >
-                  О нас
-                </Link>
-                <Link
-                  fontSize="var(--font-sm)"
-                  opacity={0.9}
-                  _hover={{ opacity: 1, textDecoration: 'underline' }}
-                  href="/restaurants"
-                >
-                  Рестораны
-                </Link>
-                <Link
-                  fontSize="var(--font-sm)"
-                  opacity={0.9}
-                  _hover={{ opacity: 1, textDecoration: 'underline' }}
-                  href="/careers"
-                >
-                  Вакансии
-                </Link>
-                <Link
-                  fontSize="var(--font-sm)"
-                  opacity={0.9}
-                  _hover={{ opacity: 1, textDecoration: 'underline' }}
-                  href="/support"
-                >
-                  Поддержка
-                </Link>
-              </VStack>
-            </VStack>
 
             {/* Социальные сети */}
             <VStack align="flex-start" gap="var(--space-3)" flex={1} minW="150px">
@@ -192,7 +153,7 @@ export function Footer() {
                   minW="140px"
                 >
                   <HStack gap="var(--space-2)">
-                    <Text fontSize="var(--font-lg)">📱</Text>
+                    <Icon as={FaGooglePlay} boxSize={5} />
                     <Text>Google Play</Text>
                   </HStack>
                 </Button>
@@ -224,7 +185,7 @@ export function Footer() {
                   minW="140px"
                 >
                   <HStack gap="var(--space-2)">
-                    <Text fontSize="var(--font-lg)">🍎</Text>
+                    <Icon as={FaAppStoreIos} boxSize={5} />
                     <Text>App Store</Text>
                   </HStack>
                 </Button>

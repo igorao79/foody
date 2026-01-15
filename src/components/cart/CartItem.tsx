@@ -1,11 +1,11 @@
 'use client';
 
-import { Box, Text, VStack, HStack, IconButton, Icon } from '@chakra-ui/react';
-import { FiCoffee } from 'react-icons/fi';
+import { Box, Text, VStack, HStack, IconButton } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { CartItem as CartItemType } from '@/types';
 import Image from 'next/image';
+import { useIsDesktop } from '@/hooks/useBreakpoint';
 
 const MotionBox = motion(Box);
 
@@ -16,6 +16,8 @@ interface CartItemProps {
 }
 
 export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
+  const isDesktop = useIsDesktop();
+
   const handleIncrement = () => {
     onUpdateQuantity(item.id, item.quantity + 1);
   };
@@ -40,134 +42,272 @@ export function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
       boxShadow="var(--shadow-sm)"
       border="1px solid var(--gray-100)"
     >
-      <HStack gap="var(--space-4)" align="flex-start">
-        {/* Изображение блюда */}
-        <Box
-          w="80px"
-          h="80px"
-          borderRadius="var(--radius-md)"
-          flexShrink={0}
-          position="relative"
-          overflow="hidden"
-        >
-          <Image
-            src={item.dish.image}
-            alt={item.dish.name}
-            fill
-            style={{ objectFit: 'cover' }}
-            sizes="80px"
-          />
-        </Box>
-
-        {/* Информация о товаре */}
-        <VStack align="flex-start" gap="var(--space-1)" flex={1}>
-          <Text
-            fontSize="var(--font-lg)"
-            fontWeight="var(--font-semibold)"
-            color="var(--primary)"
-            lineHeight="1.2"
+      {isDesktop ? (
+        /* Desktop layout - все в одной строке */
+        <Box position="relative">
+          <HStack gap="var(--space-4)" align="flex-start">
+          {/* Изображение блюда */}
+          <Box
+            w="80px"
+            h="80px"
+            borderRadius="var(--radius-md)"
+            flexShrink={0}
+            position="relative"
+            overflow="hidden"
           >
-            {item.dish.name}
-          </Text>
+            <Image
+              src={item.dish.image}
+              alt={item.dish.name}
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="80px"
+            />
+          </Box>
 
-          {/* Размер и дополнения */}
-          <VStack align="flex-start" gap="var(--space-1)">
-            {item.selectedSize && (
-              <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-                Размер: {item.selectedSize.name}
-              </Text>
-            )}
-            {item.selectedAddons.length > 0 && (
-              <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-                Дополнения: {item.selectedAddons.map(addon => addon.name).join(', ')}
-              </Text>
-            )}
+          {/* Информация о товаре */}
+          <VStack align="flex-start" gap="var(--space-1)" flex={1}>
+            <Text
+              fontSize="var(--font-lg)"
+              fontWeight="var(--font-semibold)"
+              color="var(--primary)"
+              lineHeight="1.2"
+            >
+              {item.dish.name}
+            </Text>
+
+            {/* Размер и дополнения */}
+            <VStack align="flex-start" gap="var(--space-1)">
+              {item.selectedSize && (
+                <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                  Размер: {item.selectedSize.name}
+                </Text>
+              )}
+              {item.selectedAddons.length > 0 && (
+                <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                  Дополнения: {item.selectedAddons.map(addon => addon.name).join(', ')}
+                </Text>
+              )}
+            </VStack>
+
+            {/* Цена за единицу */}
+            <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+              {item.totalPrice / item.quantity}₽ × {item.quantity}
+            </Text>
           </VStack>
 
-          {/* Цена за единицу */}
-          <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-            {item.totalPrice / item.quantity}₽ × {item.quantity}
-          </Text>
-        </VStack>
-
-        {/* Управление количеством и ценой */}
-        <VStack align="flex-end" gap="var(--space-2)">
-          <Text
-            fontSize="var(--font-lg)"
-            fontWeight="var(--font-bold)"
-            color="var(--primary)"
-          >
-            {item.totalPrice}₽
-          </Text>
-
-          <HStack gap="var(--space-1)">
-            <IconButton
-              aria-label="Уменьшить количество"
-              onClick={handleDecrement}
-              cursor="pointer"
-              size="sm"
-              variant="outline"
-              borderColor="var(--gray-300)"
+          {/* Управление количеством и ценой */}
+          <VStack align="flex-end" gap="var(--space-2)">
+            <Text
+              fontSize="var(--font-lg)"
+              fontWeight="var(--font-bold)"
               color="var(--primary)"
-              _hover={{
-                bg: 'var(--primary)',
-                color: 'var(--white)',
-              }}
             >
-              <FiMinus />
-            </IconButton>
+              {item.totalPrice}₽
+            </Text>
 
+            <HStack gap="var(--space-1)">
+              <IconButton
+                aria-label="Уменьшить количество"
+                onClick={handleDecrement}
+                cursor="pointer"
+                size="sm"
+                variant="outline"
+                borderColor="var(--gray-300)"
+                color="var(--primary)"
+                _hover={{
+                  bg: 'var(--primary)',
+                  color: 'var(--white)',
+                }}
+              >
+                <FiMinus />
+              </IconButton>
+
+              <Box
+                px="var(--space-3)"
+                py="var(--space-1)"
+                bg="var(--gray-50)"
+                borderRadius="var(--radius-md)"
+                minW="40px"
+                textAlign="center"
+              >
+                <Text
+                  fontSize="var(--font-base)"
+                  fontWeight="var(--font-semibold)"
+                  color="var(--primary)"
+                >
+                  {item.quantity}
+                </Text>
+              </Box>
+
+              <IconButton
+                aria-label="Увеличить количество"
+                onClick={handleIncrement}
+                cursor="pointer"
+                size="sm"
+                variant="outline"
+                borderColor="var(--gray-300)"
+                color="var(--primary)"
+                _hover={{
+                  bg: 'var(--primary)',
+                  color: 'var(--white)',
+                }}
+              >
+                <FiPlus />
+              </IconButton>
+            </HStack>
+          </VStack>
+
+          {/* Кнопка удаления */}
+          <IconButton
+            aria-label="Удалить из корзины"
+            onClick={() => onRemove(item.id)}
+            cursor="pointer"
+            size="sm"
+            variant="ghost"
+            color="var(--gray-500)"
+            position="absolute"
+            top="var(--space-2)"
+            right="var(--space-2)"
+            _hover={{
+              color: 'var(--accent)',
+              bg: 'rgba(92, 219, 149, 0.1)',
+            }}
+          >
+            <FiTrash2 />
+          </IconButton>
+        </HStack>
+        </Box>
+      ) : (
+        /* Mobile layout - вертикальный */
+        <VStack gap="var(--space-3)" align="stretch">
+          {/* Верхняя часть с изображением, названием и кнопкой удаления */}
+          <HStack gap="var(--space-3)" align="flex-start">
             <Box
-              px="var(--space-3)"
-              py="var(--space-1)"
-              bg="var(--gray-50)"
+              w="60px"
+              h="60px"
               borderRadius="var(--radius-md)"
-              minW="40px"
-              textAlign="center"
+              flexShrink={0}
+              position="relative"
+              overflow="hidden"
             >
+              <Image
+                src={item.dish.image}
+                alt={item.dish.name}
+                fill
+                style={{ objectFit: 'cover' }}
+                sizes="60px"
+              />
+            </Box>
+
+            <VStack align="flex-start" gap="var(--space-1)" flex={1}>
               <Text
                 fontSize="var(--font-base)"
                 fontWeight="var(--font-semibold)"
                 color="var(--primary)"
+                lineHeight="1.2"
               >
-                {item.quantity}
+                {item.dish.name}
               </Text>
-            </Box>
 
+              {/* Размер и дополнения */}
+              <VStack align="flex-start" gap="var(--space-1)">
+                {item.selectedSize && (
+                  <Text fontSize="var(--font-xs)" color="var(--gray-600)">
+                    Размер: {item.selectedSize.name}
+                  </Text>
+                )}
+                {item.selectedAddons.length > 0 && (
+                  <Text fontSize="var(--font-xs)" color="var(--gray-600)">
+                    Дополнения: {item.selectedAddons.map(addon => addon.name).join(', ')}
+                  </Text>
+                )}
+              </VStack>
+            </VStack>
+
+            {/* Кнопка удаления */}
             <IconButton
-              aria-label="Увеличить количество"
-              onClick={handleIncrement}
+              aria-label="Удалить из корзины"
+              onClick={() => onRemove(item.id)}
               cursor="pointer"
               size="sm"
-              variant="outline"
-              borderColor="var(--gray-300)"
-              color="var(--primary)"
+              variant="ghost"
+              color="var(--gray-500)"
               _hover={{
-                bg: 'var(--primary)',
-                color: 'var(--white)',
+                color: 'var(--accent)',
+                bg: 'rgba(92, 219, 149, 0.1)',
               }}
             >
-              <FiPlus />
+              <FiTrash2 />
             </IconButton>
           </HStack>
-        </VStack>
 
-        {/* Кнопка удаления */}
-        <IconButton
-          aria-label="Удалить из корзины"
-          onClick={() => onRemove(item.id)}
-          cursor="pointer"
-          size="sm"
-          variant="ghost"
-          color="var(--gray-400)"
-          _hover={{
-            color: 'var(--primary)',
-            bg: 'var(--gray-50)',
-          }}
-        >
-          <FiTrash2 />
-        </IconButton>
-      </HStack>
+          {/* Нижняя часть с ценой и управлением количеством */}
+          <HStack justify="space-between" align="center">
+            <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+              {item.totalPrice / item.quantity}₽ × {item.quantity}
+            </Text>
+
+            <HStack gap="var(--space-2)">
+              <IconButton
+                aria-label="Уменьшить количество"
+                onClick={handleDecrement}
+                cursor="pointer"
+                size="xs"
+                variant="outline"
+                borderColor="var(--gray-300)"
+                color="var(--primary)"
+                _hover={{
+                  bg: 'var(--primary)',
+                  color: 'var(--white)',
+                }}
+              >
+                <FiMinus />
+              </IconButton>
+
+              <Box
+                px="var(--space-2)"
+                py="var(--space-1)"
+                bg="var(--gray-50)"
+                borderRadius="var(--radius-md)"
+                minW="32px"
+                textAlign="center"
+              >
+                <Text
+                  fontSize="var(--font-sm)"
+                  fontWeight="var(--font-semibold)"
+                  color="var(--primary)"
+                >
+                  {item.quantity}
+                </Text>
+              </Box>
+
+              <IconButton
+                aria-label="Увеличить количество"
+                onClick={handleIncrement}
+                cursor="pointer"
+                size="xs"
+                variant="outline"
+                borderColor="var(--gray-300)"
+                color="var(--primary)"
+                _hover={{
+                  bg: 'var(--primary)',
+                  color: 'var(--white)',
+                }}
+              >
+                <FiPlus />
+              </IconButton>
+            </HStack>
+
+            <Text
+              fontSize="var(--font-lg)"
+              fontWeight="var(--font-bold)"
+              color="var(--primary)"
+            >
+              {item.totalPrice}₽
+            </Text>
+          </HStack>
+        </VStack>
+      )}
     </MotionBox>
   );
 }

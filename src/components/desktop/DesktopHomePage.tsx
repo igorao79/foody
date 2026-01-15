@@ -11,6 +11,7 @@ import { DesktopHeader } from './DesktopHeader';
 import { Footer } from '@/components/layout/Footer';
 import { SupportChatWidget } from '@/components/ui/SupportChatWidget';
 import { SupportChatModal } from '@/components/ui/modals/SupportChatModal';
+import { DishPreviewModal } from '@/components/ui/modals/DishPreviewModal';
 import { categories, restaurants, dishes } from '@/utils/mockData';
 import { Restaurant, Dish } from '@/types';
 import { useCart } from '@/contexts/CartContext';
@@ -26,6 +27,8 @@ export function DesktopHomePage() {
   const [searchResults, setSearchResults] = useState<Array<{type: 'restaurant' | 'dish', restaurant: Restaurant, dish?: Dish}>>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [isDishModalOpen, setIsDishModalOpen] = useState(false);
 
   const handleRestaurantClick = (restaurantId: string) => {
     router.push(`/restaurant/${restaurantId}`);
@@ -45,13 +48,16 @@ export function DesktopHomePage() {
 
     const lowerQuery = query.toLowerCase().trim();
 
-    // Поиск по блюдам
-    const matchingDishes = dishes.filter(dish =>
-      dish.name.toLowerCase().includes(lowerQuery) ||
-      dish.description.toLowerCase().includes(lowerQuery) ||
-      dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
-      dish.category.toLowerCase().includes(lowerQuery)
-    );
+    // Поиск по блюдам только из открытых ресторанов
+    const matchingDishes = dishes.filter(dish => {
+      const restaurant = restaurants.find(r => r.id === dish.restaurantId);
+      return restaurant?.isOpen && (
+        dish.name.toLowerCase().includes(lowerQuery) ||
+        dish.description.toLowerCase().includes(lowerQuery) ||
+        dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
+        dish.category.toLowerCase().includes(lowerQuery)
+      );
+    });
 
     // Группируем результаты по ресторанам
     const dishResults = matchingDishes
@@ -65,12 +71,14 @@ export function DesktopHomePage() {
       })
       .filter(Boolean) as Array<{type: 'dish', restaurant: Restaurant, dish: Dish}>;
 
-    // Поиск по ресторанам
+    // Поиск только по открытым ресторанам
     const matchingRestaurants = restaurants.filter(restaurant =>
-      restaurant.name.toLowerCase().includes(lowerQuery) ||
-      restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
-      restaurant.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
-      restaurant.description?.toLowerCase().includes(lowerQuery)
+      restaurant.isOpen && (
+        restaurant.name.toLowerCase().includes(lowerQuery) ||
+        restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
+        restaurant.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+        restaurant.description?.toLowerCase().includes(lowerQuery)
+      )
     );
 
     const restaurantResults = matchingRestaurants.map(restaurant => ({
@@ -83,10 +91,9 @@ export function DesktopHomePage() {
     setShowSearchDropdown(allResults.length > 0);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDishClick = (_dish?: Dish) => {
-    // Теперь блюда добавляются через кнопки + в dropdown
-    // Этот обработчик можно оставить пустым или удалить
+  const handleDishClick = (dish: Dish) => {
+    setSelectedDish(dish);
+    setIsDishModalOpen(true);
   };
 
   const handleRestaurantClickFromSearch = (restaurantId: string) => {
@@ -420,6 +427,13 @@ export function DesktopHomePage() {
 
       {/* Виджет поддержки */}
       <SupportChatWidget onChatOpen={() => setIsChatOpen(true)} />
+
+      {/* Модалка блюда */}
+      <DishPreviewModal
+        isOpen={isDishModalOpen}
+        onClose={() => setIsDishModalOpen(false)}
+        dish={selectedDish}
+      />
 
       {/* Чат поддержки */}
       <SupportChatModal

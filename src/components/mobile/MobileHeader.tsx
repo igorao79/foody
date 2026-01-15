@@ -7,6 +7,7 @@ import { FiSearch, FiShoppingBag, FiTruck, FiHome, FiMinus, FiPlus } from 'react
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
+import { useOrder } from '@/contexts/OrderContext';
 import { restaurants, dishes, categories } from '@/utils/mockData';
 
 interface MobileHeaderProps {
@@ -18,8 +19,8 @@ const MotionBox = motion(Box);
 export function MobileHeader({ onSearch }: MobileHeaderProps) {
   const router = useRouter();
   const { getItemCount, addItem, getItemQuantity, removeItemByDishId } = useCart();
+  const { orderType, setOrderType } = useOrder();
   const [searchQuery, setSearchQuery] = useState('');
-  const [orderType, setOrderType] = useState('delivery');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
@@ -160,7 +161,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
             position="relative"
             bg="var(--gray-100)"
             borderRadius="var(--radius-full)"
-            p="var(--space-1)"
+            p="var(--space-2)"
             display="flex"
             cursor="pointer"
             onClick={() => setOrderType(orderType === 'delivery' ? 'pickup' : 'delivery')}
@@ -187,14 +188,17 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               flex={1}
               justify="center"
               gap="var(--space-1)"
-              p="var(--space-1)"
+              p="var(--space-2)"
               borderRadius="var(--radius-full)"
               position="relative"
               zIndex={1}
               color={orderType === 'delivery' ? 'var(--white)' : 'var(--gray-700)'}
               transition="color 0.3s ease"
             >
-              <Icon as={FiTruck} boxSize={3} />
+              <Icon as={FiTruck} boxSize={4} />
+              <Text fontSize="var(--font-xs)" fontWeight="var(--font-medium)">
+                Доставка
+              </Text>
             </HStack>
 
             {/* Самовывоз */}
@@ -202,14 +206,17 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               flex={1}
               justify="center"
               gap="var(--space-1)"
-              p="var(--space-1)"
+              p="var(--space-2)"
               borderRadius="var(--radius-full)"
               position="relative"
               zIndex={1}
               color={orderType === 'pickup' ? 'var(--white)' : 'var(--gray-700)'}
               transition="color 0.3s ease"
             >
-              <Icon as={FiHome} boxSize={3} />
+              <Icon as={FiHome} boxSize={4} />
+              <Text fontSize="var(--font-xs)" fontWeight="var(--font-medium)">
+                Самовывоз
+              </Text>
             </HStack>
           </Box>
         </HStack>

@@ -44,13 +44,16 @@ export function MobileHomePage({ onSearch }: { onSearch?: (query: string) => voi
 
     const lowerQuery = query.toLowerCase().trim();
 
-    // Поиск по блюдам
-    const matchingDishes = dishes.filter(dish =>
-      dish.name.toLowerCase().includes(lowerQuery) ||
-      dish.description.toLowerCase().includes(lowerQuery) ||
-      dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
-      dish.category.toLowerCase().includes(lowerQuery)
-    );
+    // Поиск по блюдам только из открытых ресторанов
+    const matchingDishes = dishes.filter(dish => {
+      const restaurant = restaurants.find(r => r.id === dish.restaurantId);
+      return restaurant?.isOpen && (
+        dish.name.toLowerCase().includes(lowerQuery) ||
+        dish.description.toLowerCase().includes(lowerQuery) ||
+        dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
+        dish.category.toLowerCase().includes(lowerQuery)
+      );
+    });
 
     // Группируем результаты по ресторанам
     const dishResults = matchingDishes.map(dish => {
@@ -62,12 +65,14 @@ export function MobileHomePage({ onSearch }: { onSearch?: (query: string) => voi
       };
     });
 
-    // Поиск по ресторанам
+    // Поиск только по открытым ресторанам
     const matchingRestaurants = restaurants.filter(restaurant =>
-      restaurant.name.toLowerCase().includes(lowerQuery) ||
-      restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
-      restaurant.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
-      restaurant.description?.toLowerCase().includes(lowerQuery)
+      restaurant.isOpen && (
+        restaurant.name.toLowerCase().includes(lowerQuery) ||
+        restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
+        restaurant.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+        restaurant.description?.toLowerCase().includes(lowerQuery)
+      )
     );
 
     const restaurantResults = matchingRestaurants.map(restaurant => ({

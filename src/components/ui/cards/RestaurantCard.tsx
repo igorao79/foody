@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Box, Text, VStack, HStack, Badge, AspectRatio } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Badge, AspectRatio, Icon } from '@chakra-ui/react';
+import { FiMapPin } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Restaurant } from '@/types';
 import { Rating } from '../feedback/Rating';
 import { ReviewsModal } from '../modals/ReviewsModal';
+import { useOrder } from '@/contexts/OrderContext';
 
 const MotionBox = motion(Box);
 
@@ -16,11 +18,20 @@ interface RestaurantCardProps {
 }
 
 export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
+  const { orderType } = useOrder();
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
 
   const handleRatingClick = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation(); // Предотвращаем всплытие события к карточке
     setIsReviewsModalOpen(true);
+  };
+
+  // Форматируем расстояние
+  const formatDistance = (distance: number) => {
+    if (distance < 1000) {
+      return `${distance}м`;
+    }
+    return `${(distance / 1000).toFixed(1)}км`;
   };
 
   return (
@@ -34,20 +45,21 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      as="button"
-      onClick={onClick}
-      cursor="pointer"
+      as={restaurant.isOpen ? "button" : "div"}
+      onClick={restaurant.isOpen ? onClick : undefined}
+      cursor={restaurant.isOpen ? "pointer" : "not-allowed"}
       mx="var(--space-4)"
       mb="var(--space-4)"
       borderRadius="var(--radius-lg)"
       overflow="hidden"
-      bg="var(--white)"
+      bg={restaurant.isOpen ? "var(--white)" : "var(--gray-50)"}
       boxShadow="var(--shadow-sm)"
-      whileHover={{ y: -4, boxShadow: 'var(--shadow-lg)' }}
-      whileTap={{ scale: 0.98 }}
+      opacity={restaurant.isOpen ? 1 : 0.6}
+      whileHover={restaurant.isOpen ? { y: -4, boxShadow: 'var(--shadow-lg)' } : {}}
+      whileTap={restaurant.isOpen ? { scale: 0.98 } : {}}
     >
       <AspectRatio ratio={16 / 10}>
-        <Box position="relative">
+        <Box position="relative" opacity={restaurant.isOpen ? 1 : 0.6}>
           <Image
             src={restaurant.image}
             alt={restaurant.name}
@@ -117,9 +129,18 @@ export function RestaurantCard({ restaurant, onClick }: RestaurantCardProps) {
             <Text fontSize="var(--font-sm)" color="var(--gray-600)">
               •
             </Text>
-            <Text fontSize="var(--font-sm)" color="var(--gray-600)">
-              {restaurant.deliveryFee}₽ доставка
-            </Text>
+            {orderType === 'pickup' && restaurant.distance ? (
+              <HStack gap="var(--space-1)" align="center">
+                <Icon as={FiMapPin} boxSize={3} color="var(--gray-600)" />
+                <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                  {formatDistance(restaurant.distance)}
+                </Text>
+              </HStack>
+            ) : (
+              <Text fontSize="var(--font-sm)" color="var(--gray-600)">
+                {restaurant.deliveryFee}₽ доставка
+              </Text>
+            )}
           </HStack>
         </HStack>
       </VStack>

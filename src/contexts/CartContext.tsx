@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
 import { CartItem, Cart, Dish, DishSize, DishAddon } from '@/types';
+import { promoCodes, PromoCode } from '@/utils/mockData';
 
 type CartState = Cart;
 
@@ -66,6 +67,49 @@ function calculateItemTotal(dish: Dish, quantity: number, selectedSize?: DishSiz
   const basePrice = selectedSize?.price || dish.price;
   const addonsPrice = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
   return (basePrice + addonsPrice) * quantity;
+}
+
+function validatePromoCode(code: string, cartItems: CartItem[], orderTotal: number): { discount: number; promo: PromoCode | null; error?: string } {
+  const promo = promoCodes.find(p => p.code.toLowerCase() === code.toLowerCase() && p.isActive);
+
+  if (!promo) {
+    return { discount: 0, promo: null, error: 'Промокод не найден' };
+  }
+
+  // Проверяем минимальную сумму заказа
+  if (promo.minOrderAmount && orderTotal < promo.minOrderAmount) {
+    return { discount: 0, promo: null, error: `Минимальная сумма заказа ${promo.minOrderAmount}₽` };
+  }
+
+  // Проверяем применимость к категориям
+  if (promo.applicableCategories && promo.applicableCategories.length > 0) {
+    const hasApplicableItems = cartItems.some(item => {
+      const itemCategory = item.dish.category;
+      return promo.applicableCategories!.includes(itemCategory);
+    });
+
+    if (!hasApplicableItems) {
+      return { discount: 0, promo: null, error: 'Промокод не подходит к товарам в заказе' };
+    }
+  }
+
+  // Рассчитываем скидку
+  let discount = 0;
+  if (promo.discountType === 'fixed') {
+    discount = promo.discount;
+  } else if (promo.discountType === 'percentage') {
+    // Для процентной скидки применяем только к подходящим категориям
+    if (promo.applicableCategories && promo.applicableCategories.length > 0) {
+      const applicableTotal = cartItems
+        .filter(item => promo.applicableCategories!.includes(item.dish.category))
+        .reduce((sum, item) => sum + item.totalPrice, 0);
+      discount = Math.round(applicableTotal * promo.discount / 100);
+    } else {
+      discount = Math.round(orderTotal * promo.discount / 100);
+    }
+  }
+
+  return { discount, promo };
 }
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -188,7 +232,7 @@ interface CartContextType {
   removeItem: (id: string) => void;
   removeItemByDishId: (dishId: string) => void;
   clearCart: () => void;
-  applyPromo: (code: string, discount: number) => void;
+  applyPromo: (code: string) => { success: boolean; discount?: number; error?: string };
   removePromo: () => void;
   getItemCount: () => number;
   getItemQuantity: (dishId: string) => number;
@@ -232,8 +276,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'CLEAR_CART' });
   };
 
-  const applyPromo = (code: string, discount: number) => {
-    dispatch({ type: 'APPLY_PROMO', payload: { code, discount } });
+  const applyPromo = (code: string) => {
+    // Проверяем, есть ли уже примененный промокод
+    if (cart.promoCode) {
+      return { success: false, error: 'Можно применить только один промокод' };
+    }
+
+    const itemsTotal = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+    const { discount, promo, error } = validatePromoCode(code, cart.items, itemsTotal);
+
+    if (error || !promo) {
+      return { success: false, error: error || 'Промокод не найден' };
+    }
+
+    dispatch({ type: 'APPLY_PROMO', payload: { code: promo.code, discount } });
+    return { success: true, discount };
   };
 
   const removePromo = () => {

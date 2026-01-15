@@ -17,3 +17,4 @@ export function useIsDesktop() {
   const breakpoint = useBreakpoint();
   return breakpoint === 'desktop';
 }
+

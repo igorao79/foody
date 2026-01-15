@@ -1,6 +1,16 @@
 import { Restaurant, Dish, Category, PromoBanner } from '@/types';
 import { GiPizzaSlice, GiHamburger, GiSushis } from 'react-icons/gi';
 
+export interface PromoCode {
+  code: string;
+  discount: number; // в рублях или процентах
+  discountType: 'fixed' | 'percentage'; // тип скидки
+  description: string;
+  applicableCategories?: string[]; // категории, на которые действует (опционально)
+  minOrderAmount?: number; // минимальная сумма заказа
+  isActive: boolean;
+}
+
 export const categories: Category[] = [
   { id: 'all', name: 'Все', icon: () => null, color: 'var(--primary)' },
   { id: '1', name: 'Итальянская', icon: GiPizzaSlice, color: 'var(--secondary)' },
@@ -30,6 +40,52 @@ export const promoBanners: PromoBanner[] = [
   },
 ];
 
+export const promoCodes: PromoCode[] = [
+  {
+    code: 'WELCOME20',
+    discount: 20,
+    discountType: 'fixed',
+    description: 'Скидка 20₽ на первый заказ',
+    minOrderAmount: 300,
+    isActive: true,
+  },
+  {
+    code: 'PIZZA15',
+    discount: 15,
+    discountType: 'percentage',
+    description: 'Скидка 15% на пиццу',
+    applicableCategories: ['Итальянская'],
+    minOrderAmount: 500,
+    isActive: true,
+  },
+  {
+    code: 'BURGER200',
+    discount: 200,
+    discountType: 'fixed',
+    description: 'Скидка 200₽ на бургеры',
+    applicableCategories: ['Американская'],
+    minOrderAmount: 800,
+    isActive: true,
+  },
+  {
+    code: 'SUSHI10',
+    discount: 10,
+    discountType: 'percentage',
+    description: 'Скидка 10% на суши',
+    applicableCategories: ['Японская'],
+    minOrderAmount: 600,
+    isActive: true,
+  },
+  {
+    code: 'FIRSTORDER',
+    discount: 150,
+    discountType: 'fixed',
+    description: 'Скидка 150₽ на первый заказ',
+    minOrderAmount: 400,
+    isActive: true,
+  },
+];
+
 export const restaurants: Restaurant[] = [
   {
     id: '1',
@@ -38,6 +94,7 @@ export const restaurants: Restaurant[] = [
     rating: 4.7,
     deliveryTime: '25-35 мин',
     deliveryFee: 150,
+    distance: 1200, // 1.2 км
     cuisines: ['Итальянская'],
     tags: ['пицца', 'паста', 'итальянская', 'тирамису', 'десерты'],
     isOpen: true,
@@ -50,6 +107,7 @@ export const restaurants: Restaurant[] = [
     rating: 4.5,
     deliveryTime: '20-30 мин',
     deliveryFee: 120,
+    distance: 800, // 800м
     cuisines: ['Китайская', 'Японская'],
     tags: ['том ям', 'супы', 'креветки', 'лайм'],
     isOpen: true,
@@ -62,6 +120,7 @@ export const restaurants: Restaurant[] = [
     rating: 4.3,
     deliveryTime: '15-25 мин',
     deliveryFee: 100,
+    distance: 1500, // 1.5 км
     cuisines: ['Американская'],
     tags: ['американская', 'бургер', 'чизбургер', 'картофель фри'],
     isOpen: true,
@@ -74,6 +133,7 @@ export const restaurants: Restaurant[] = [
     rating: 4.6,
     deliveryTime: '30-40 мин',
     deliveryFee: 180,
+    distance: 2200, // 2.2 км
     cuisines: ['Итальянская'],
     tags: ['пицца', 'итальянская', 'маргарита', 'паста', 'карбонара'],
     isOpen: false,

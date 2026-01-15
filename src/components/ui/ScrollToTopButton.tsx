@@ -39,8 +39,8 @@ export function ScrollToTopButton() {
           exit={{ opacity: 0, scale: 0.8 }}
           transition={{ duration: 0.2 }}
           position="fixed"
-          bottom="var(--space-6)"
-          right="var(--space-6)"
+          bottom="var(--space-8)"
+          right="var(--space-2)"
           zIndex={999}
           w="50px"
           h="50px"
@@ -68,3 +68,4 @@ export function ScrollToTopButton() {
     </AnimatePresence>
   );
 }
+

@@ -71,14 +71,15 @@ export function PersonalOffersMarquee() {
         overflow="hidden"
         bg="linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)"
         borderRadius="var(--radius-lg)"
-        p="var(--space-4)"
+        w="100%"
+        p="var(--space-5)"
         mb="var(--space-4)"
         boxShadow="var(--shadow-md)"
         _hover={{
           boxShadow: 'var(--shadow-lg)',
           transform: 'translateY(-2px)'
         }}
-        transition="all 0.3s ease"
+        transition="all 3.3s ease"
       >
         {/* Анимированная полоска */}
         <Box
@@ -88,13 +89,14 @@ export function PersonalOffersMarquee() {
           right={0}
           bottom={0}
           overflow="hidden"
+          p="var(--space-4)"
         >
           <motion.div
             animate={{
               x: ['100%', '-100%']
             }}
             transition={{
-              duration: 20,
+              duration: 40,
               repeat: Infinity,
               ease: 'linear'
             }}
@@ -140,9 +142,6 @@ export function PersonalOffersMarquee() {
           textAlign="center"
           py="var(--space-1)"
         >
-          <Text fontSize="var(--font-sm)" color="rgba(255,255,255,0.9)" fontWeight="var(--font-medium)">
-            Нажмите, чтобы посмотреть все предложения
-          </Text>
         </Box>
       </Box>
 
