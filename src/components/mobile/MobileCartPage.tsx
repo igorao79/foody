@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, VStack, Text, HStack, Button, Icon, Divider } from '@chakra-ui/react';
+import { Box, VStack, Text, HStack, Button, Icon } from '@chakra-ui/react';
 import { FiShoppingCart, FiMapPin } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/ui/navigation/Header';
 import { CartItem } from '@/components/cart/CartItem';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { useCart } from '@/contexts/CartContext';
+import { useOrder } from '@/contexts/OrderContext';
 import { restaurants } from '@/utils/mockData';
 
 const MotionBox = motion(Box);
@@ -16,14 +17,28 @@ const MotionBox = motion(Box);
 export function MobileCartPage() {
   const router = useRouter();
   const { cart, updateItem, removeItem, applyPromo, removePromo } = useCart();
+  const { orderType } = useOrder();
+
+  // Находим адрес ресторана с наибольшим количеством товаров для pickup
+  const getPickupAddress = () => {
+    const restaurantCounts: { [key: string]: number } = {};
+    cart.items.forEach(item => {
+      restaurantCounts[item.dish.restaurantId] = (restaurantCounts[item.dish.restaurantId] || 0) + item.quantity;
+    });
+
+    const mainRestaurantId = Object.entries(restaurantCounts)
+      .sort(([,a], [,b]) => b - a)[0]?.[0];
+
+    const restaurant = restaurants.find(r => r.id === mainRestaurantId);
+    return restaurant?.address || 'Адрес ресторана';
+  };
 
   const handleCheckout = () => {
     router.push('/checkout');
   };
 
   const handlePromoApply = (code: string) => {
-    const discount = code === 'DISCOUNT30' ? 150 : 50;
-    applyPromo(code, discount);
+    return applyPromo(code);
   };
 
   const handlePromoRemove = () => {
@@ -170,14 +185,25 @@ export function MobileCartPage() {
                 </Text>
               </HStack>
 
-              <HStack justify="space-between">
-                <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                  Доставка
-                </Text>
-                <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
-                  {cart.deliveryFee}₽
-                </Text>
-              </HStack>
+              {orderType === 'delivery' ? (
+                <HStack justify="space-between">
+                  <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                    Доставка
+                  </Text>
+                  <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                    {cart.deliveryFee}₽
+                  </Text>
+                </HStack>
+              ) : (
+                <VStack align="flex-start" gap="var(--space-1)">
+                  <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                    Самовывоз
+                  </Text>
+                  <Text fontSize="var(--font-sm)" color="var(--primary)">
+                    Адрес: {getPickupAddress()}
+                  </Text>
+                </VStack>
+              )}
 
               {cart.discount > 0 && (
                 <HStack justify="space-between">
@@ -197,7 +223,7 @@ export function MobileCartPage() {
                   Итого
                 </Text>
                 <Text fontSize="var(--font-xl)" fontWeight="var(--font-bold)" color="var(--primary)">
-                  {cart.total}₽
+                  {cart.items.reduce((sum, item) => sum + item.totalPrice, 0) + (orderType === 'delivery' ? cart.deliveryFee : 0) - cart.discount}₽
                 </Text>
               </HStack>
             </VStack>

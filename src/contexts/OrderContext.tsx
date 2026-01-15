@@ -44,6 +44,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   const [orderType, setOrderTypeState] = useState<OrderType>(loadOrderTypeFromStorage);
 
   const setOrderType = (type: OrderType) => {
+    console.log('OrderContext: setOrderType called with', type);
     setOrderTypeState(type);
     saveOrderTypeToStorage(type);
   };

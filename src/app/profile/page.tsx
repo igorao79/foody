@@ -48,7 +48,7 @@ export default function ProfilePage() {
         </Layout>
       )}
 
-      <Box pt={isDesktop ? "120px" : "0"} minH="100vh" position="relative" zIndex={1}>
+      <Box pt={isDesktop ? "120px" : "76px"} minH="100vh" position="relative" zIndex={1}>
         <Box maxW="1400px" mx="auto" px={isDesktop ? "var(--space-6)" : "var(--space-4)"} py="var(--space-6)">
           <MotionBox
             initial={{ opacity: 0, y: 20 }}

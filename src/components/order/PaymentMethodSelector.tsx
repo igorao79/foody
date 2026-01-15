@@ -13,12 +13,12 @@ interface PaymentMethodSelectorProps {
 
 export function PaymentMethodSelector({ selectedMethod, onMethodSelect }: PaymentMethodSelectorProps) {
   return (
-    <VStack align="stretch" spacing="var(--space-4)">
+    <VStack align="stretch" gap="var(--space-4)">
       <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)">
         Способ оплаты
       </Text>
 
-      <VStack align="stretch" spacing="var(--space-2)">
+      <VStack align="stretch" gap="var(--space-2)">
         {/* Оплата картой */}
         <MotionBox
           as="button"
@@ -29,15 +29,14 @@ export function PaymentMethodSelector({ selectedMethod, onMethodSelect }: Paymen
           border={selectedMethod === 'card' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
           bg={selectedMethod === 'card' ? 'var(--gray-50)' : 'var(--white)'}
           textAlign="left"
-          transition="all 0.2s ease"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <HStack spacing="var(--space-3)">
+          <HStack gap="var(--space-3)">
             <Box color="var(--secondary)" mt="2px">
               <FiCreditCard size={20} />
             </Box>
-            <VStack align="flex-start" spacing="var(--space-1)">
+            <VStack align="flex-start" gap="var(--space-1)">
               <Text fontSize="var(--font-base)" fontWeight="var(--font-medium)" color="var(--primary)">
                 Банковской картой
               </Text>
@@ -58,15 +57,14 @@ export function PaymentMethodSelector({ selectedMethod, onMethodSelect }: Paymen
           border={selectedMethod === 'cash' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
           bg={selectedMethod === 'cash' ? 'var(--gray-50)' : 'var(--white)'}
           textAlign="left"
-          transition="all 0.2s ease"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <HStack spacing="var(--space-3)">
+          <HStack gap="var(--space-3)">
             <Box color="var(--accent)" mt="2px">
               <FiDollarSign size={20} />
             </Box>
-            <VStack align="flex-start" spacing="var(--space-1)">
+            <VStack align="flex-start" gap="var(--space-1)">
               <Text fontSize="var(--font-base)" fontWeight="var(--font-medium)" color="var(--primary)">
                 Наличными курьеру
               </Text>

@@ -95,6 +95,7 @@ export const restaurants: Restaurant[] = [
     deliveryTime: '25-35 мин',
     deliveryFee: 150,
     distance: 1200, // 1.2 км
+    address: 'ул. Ленина, 15',
     cuisines: ['Итальянская'],
     tags: ['пицца', 'паста', 'итальянская', 'тирамису', 'десерты'],
     isOpen: true,
@@ -108,6 +109,7 @@ export const restaurants: Restaurant[] = [
     deliveryTime: '20-30 мин',
     deliveryFee: 120,
     distance: 800, // 800м
+    address: 'пр. Победы, 7',
     cuisines: ['Китайская', 'Японская'],
     tags: ['том ям', 'супы', 'креветки', 'лайм'],
     isOpen: true,
@@ -121,6 +123,7 @@ export const restaurants: Restaurant[] = [
     deliveryTime: '15-25 мин',
     deliveryFee: 100,
     distance: 1500, // 1.5 км
+    address: 'ул. Гагарина, 12',
     cuisines: ['Американская'],
     tags: ['американская', 'бургер', 'чизбургер', 'картофель фри'],
     isOpen: true,
@@ -134,6 +137,7 @@ export const restaurants: Restaurant[] = [
     deliveryTime: '30-40 мин',
     deliveryFee: 180,
     distance: 2200, // 2.2 км
+    address: 'ул. Кирова, 25',
     cuisines: ['Итальянская'],
     tags: ['пицца', 'итальянская', 'маргарита', 'паста', 'карбонара'],
     isOpen: false,

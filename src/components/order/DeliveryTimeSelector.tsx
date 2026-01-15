@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Text, VStack, HStack, Button, Select } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Button, NativeSelect } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiClock } from 'react-icons/fi';
 
@@ -40,12 +40,12 @@ export function DeliveryTimeSelector({ selectedTime, onTimeSelect }: DeliveryTim
   const timeOptions = generateTimeOptions();
 
   return (
-    <VStack align="stretch" spacing="var(--space-4)">
+    <VStack align="stretch" gap="var(--space-4)">
       <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)">
         Время доставки
       </Text>
 
-      <VStack align="stretch" spacing="var(--space-3)">
+      <VStack align="stretch" gap="var(--space-3)">
         {/* Кнопка "Как можно скорее" */}
         <MotionBox
           as="button"
@@ -56,15 +56,14 @@ export function DeliveryTimeSelector({ selectedTime, onTimeSelect }: DeliveryTim
           border={selectedTime === 'asap' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
           bg={selectedTime === 'asap' ? 'var(--gray-50)' : 'var(--white)'}
           textAlign="left"
-          transition="all 0.2s ease"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <HStack spacing="var(--space-3)">
+          <HStack gap="var(--space-3)">
             <Box color="var(--accent)" mt="2px">
               <FiClock size={20} />
             </Box>
-            <VStack align="flex-start" spacing="var(--space-1)">
+            <VStack align="flex-start" gap="var(--space-1)">
               <Text fontSize="var(--font-base)" fontWeight="var(--font-medium)" color="var(--primary)">
                 Как можно скорее
               </Text>
@@ -85,15 +84,14 @@ export function DeliveryTimeSelector({ selectedTime, onTimeSelect }: DeliveryTim
           border={selectedTime !== 'asap' ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
           bg={selectedTime !== 'asap' ? 'var(--gray-50)' : 'var(--white)'}
           textAlign="left"
-          transition="all 0.2s ease"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <HStack spacing="var(--space-3)">
+          <HStack gap="var(--space-3)">
             <Box color="var(--secondary)" mt="2px">
               <FiClock size={20} />
             </Box>
-            <VStack align="flex-start" spacing="var(--space-1)">
+            <VStack align="flex-start" gap="var(--space-1)">
               <Text fontSize="var(--font-base)" fontWeight="var(--font-medium)" color="var(--primary)">
                 К определенному времени
               </Text>
@@ -115,24 +113,26 @@ export function DeliveryTimeSelector({ selectedTime, onTimeSelect }: DeliveryTim
             borderRadius="var(--radius-md)"
             bg="var(--gray-50)"
           >
-            <Select
-              value={selectedTime}
-              onChange={(e) => onTimeSelect(e.target.value)}
-              bg="var(--white)"
-              border="1px solid var(--gray-200)"
-              borderRadius="var(--radius-md)"
-              fontSize="var(--font-base)"
-              _focus={{
-                borderColor: 'var(--primary)',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
+            <NativeSelect.Root>
+              <NativeSelect.Field
+                value={selectedTime}
+                onChange={(e) => onTimeSelect(e.target.value)}
+                bg="var(--white)"
+                border="1px solid var(--gray-200)"
+                borderRadius="var(--radius-lg)"
+                fontSize="var(--font-base)"
+                _focus={{
+                  borderColor: 'var(--primary)',
+                  boxShadow: 'var(--shadow-sm)',
+                }}
+              >
               {timeOptions.map((time) => (
                 <option key={time} value={time}>
                   {time}
                 </option>
               ))}
-            </Select>
+              </NativeSelect.Field>
+            </NativeSelect.Root>
           </MotionBox>
         )}
       </VStack>

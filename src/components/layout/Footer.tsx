@@ -11,6 +11,8 @@ export function Footer() {
       bg="linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)"
       color="var(--white)"
       mt="auto"
+      pt="var(--space-6)"
+      pb="var(--space-6)"
     >
       <Container maxW="1200px" py="var(--space-12)">
         <VStack gap="var(--space-6)" align="stretch">

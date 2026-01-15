@@ -15,9 +15,7 @@ export function BottomNavigation() {
 
   const navItems = [
     { id: 'home', label: 'Главная', icon: FiHome, path: '/' },
-    { id: 'search', label: 'Поиск', icon: FiSearch, path: '/search' },
     { id: 'orders', label: 'Заказы', icon: FiShoppingBag, path: '/orders' },
-    { id: 'favorites', label: 'Избранное', icon: FiHeart, path: '/favorites' },
     { id: 'profile', label: user ? 'Профиль' : 'Вход', icon: user ? FiUser : FiLogIn, path: user ? '/profile' : '/login' },
   ];
 

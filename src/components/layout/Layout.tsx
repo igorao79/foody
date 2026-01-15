@@ -20,7 +20,7 @@ export function Layout({
   bg = 'var(--background)'
 }: LayoutProps) {
   return (
-    <Box minH="100vh" bg={bg} display="flex" flexDirection="column">
+    <Box  bg={bg} display="flex" flexDirection="column">
       <Box
         flex={1}
         w="100%"

@@ -117,7 +117,9 @@ export function DesktopHeader({ onSearch, onDishClick, showOrderType = true }: D
                 p="var(--space-1)"
                 display="flex"
                 cursor="pointer"
-                onClick={() => setOrderType(orderType === 'delivery' ? 'pickup' : 'delivery')}
+                onClick={() => {
+                  setOrderType(orderType === 'delivery' ? 'pickup' : 'delivery');
+                }}
                 transition="all 0.2s ease"
                 _hover={{
                   borderColor: 'var(--gray-300)',

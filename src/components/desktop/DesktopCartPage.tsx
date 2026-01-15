@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { Box, VStack, Text, HStack, Button, Container, Grid, GridItem, Icon, Input, NativeSelect, Textarea } from '@chakra-ui/react';
-import { FiShoppingCart, FiMapPin } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import { Box, VStack, Text, HStack, Button, Container, Grid, GridItem, Icon, Input, NativeSelect, Textarea, Circle, Stack } from '@chakra-ui/react';
+import { FiShoppingCart, FiMapPin, FiCheck, FiClock, FiShoppingBag, FiTruck, FiMapPin as FiMapPinIcon, FiX } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CartItem } from '@/components/cart/CartItem';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { DesktopHeader } from './DesktopHeader';
@@ -18,11 +19,46 @@ export function DesktopCartPage() {
   const router = useRouter();
   const { cart, updateItem, removeItem, applyPromo, removePromo, clearCart } = useCart();
   const { orderType } = useOrder();
+
+  console.log('DesktopCartPage orderType:', orderType); // Debug
+
+  // Находим адрес ресторана с наибольшим количеством товаров для pickup
+  const getPickupAddress = () => {
+    if (cart.items.length === 0) return 'Адрес ресторана';
+
+    const restaurantCounts: { [key: string]: number } = {};
+    cart.items.forEach(item => {
+      restaurantCounts[item.dish.restaurantId] = (restaurantCounts[item.dish.restaurantId] || 0) + item.quantity;
+    });
+
+    const mainRestaurantId = Object.entries(restaurantCounts)
+      .sort(([,a], [,b]) => b - a)[0]?.[0];
+
+    const restaurant = restaurants.find(r => r.id === mainRestaurantId);
+    return restaurant?.address || 'Адрес ресторана';
+  };
   const [showCheckout, setShowCheckout] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState('Ленинский проспект, 1');
   const [deliveryTime, setDeliveryTime] = useState('asap');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [comment, setComment] = useState('');
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const deliverySteps = [
+    { label: 'Заказ передан в ресторан', icon: FiShoppingBag },
+    { label: 'Заказ готовится', icon: FiClock },
+    { label: 'Заказ едет к вам', icon: FiTruck },
+    { label: 'Заказ получен', icon: FiMapPinIcon },
+  ];
+
+  const pickupSteps = [
+    { label: 'Заказ передан в ресторан', icon: FiShoppingBag },
+    { label: 'Заказ готовится', icon: FiClock },
+    { label: 'Заказ получен', icon: FiMapPinIcon },
+  ];
+
+  const steps = orderType === 'pickup' ? pickupSteps : deliverySteps;
 
   const handleCheckout = () => {
     setShowCheckout(true);
@@ -36,14 +72,32 @@ export function DesktopCartPage() {
     if (!selectedAddress.trim()) {
       return;
     }
-    // Имитация создания заказа
-    clearCart();
-    router.push('/success');
+    setShowProgressModal(true);
+    setCurrentStep(0);
+
+    // Имитация прогресса заказа
+    const progressInterval = setInterval(() => {
+      setCurrentStep(prev => {
+        if (prev < steps.length - 1) {
+          return prev + 1;
+        } else {
+          clearInterval(progressInterval);
+          setTimeout(() => {
+            clearCart();
+          }, 1000);
+          return prev;
+        }
+      });
+    }, 2000);
   };
 
-  const handlePromoApply = (code: string) => {
-    const discount = code === 'DISCOUNT30' ? 150 : 50;
-    applyPromo(code, discount);
+  const handleCloseModal = () => {
+    setShowProgressModal(false);
+    setCurrentStep(0);
+  };
+
+  const handlePromoApplyWrapper = (code: string) => {
+    return applyPromo(code);
   };
 
   const handlePromoRemove = () => {
@@ -311,25 +365,28 @@ export function DesktopCartPage() {
                     </Text>
                   </HStack>
 
-                  {orderType === 'delivery' ? (
-                    <HStack justify="space-between">
-                      <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                        Доставка
-                      </Text>
-                      <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
-                        {cart.deliveryFee}₽
-                      </Text>
-                    </HStack>
-                  ) : (
-                    <VStack align="flex-start" gap="var(--space-1)">
-                      <Text fontSize="var(--font-base)" color="var(--gray-600)">
-                        Самовывоз
-                      </Text>
-                      <Text fontSize="var(--font-sm)" color="var(--primary)">
-                        Адрес ресторана: ул. Примерная, 1
-                      </Text>
-                    </VStack>
-                  )}
+                  {(() => {
+                    console.log('Rendering delivery/pickup block with orderType:', orderType);
+                    return orderType === 'delivery' ? (
+                      <HStack justify="space-between" key="delivery">
+                        <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                          Доставка
+                        </Text>
+                        <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                          {cart.deliveryFee}₽
+                        </Text>
+                      </HStack>
+                    ) : (
+                      <VStack align="flex-start" gap="var(--space-1)" key="pickup">
+                        <Text fontSize="var(--font-base)" color="var(--gray-600)">
+                          Самовывоз
+                        </Text>
+                        <Text fontSize="var(--font-sm)" color="var(--primary)">
+                          Адрес: {getPickupAddress()}
+                        </Text>
+                      </VStack>
+                    );
+                  })()}
 
                   {cart.discount > 0 && (
                     <HStack justify="space-between">
@@ -430,7 +487,7 @@ export function DesktopCartPage() {
                 {/* Промокод */}
                 <PromoCodeInput
                   currentPromo={cart.promoCode}
-                  onApplyPromo={handlePromoApply}
+                  onApplyPromo={handlePromoApplyWrapper}
                   onRemovePromo={handlePromoRemove}
                 />
 
@@ -508,6 +565,157 @@ export function DesktopCartPage() {
         )}
         </MotionBox>
       </Container>
+
+      {/* Progress Modal */}
+      {showProgressModal && createPortal(
+        <AnimatePresence>
+          <MotionBox
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            position="fixed"
+            top="0"
+            left="0"
+            right="0"
+            bottom="0"
+            bg="rgba(0, 0, 0, 0.8)"
+            zIndex={9999}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            p="var(--space-4)"
+          >
+            <MotionBox
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              bg="var(--white)"
+              borderRadius="var(--radius-xl)"
+              p="var(--space-8)"
+              maxW="400px"
+              w="100%"
+              position="relative"
+            >
+              {/* Close button */}
+              <Button
+                position="absolute"
+                top="var(--space-4)"
+                right="var(--space-4)"
+                variant="ghost"
+                size="sm"
+                onClick={handleCloseModal}
+                cursor="pointer"
+                minW="auto"
+                h="auto"
+                p="var(--space-2)"
+              >
+                <Icon as={FiX} boxSize={5} />
+              </Button>
+
+              <VStack gap="var(--space-6)" align="center">
+                <Text fontSize="var(--font-xl)" fontWeight="var(--font-bold)" color="var(--primary)" textAlign="center">
+                  Заказ оформлен!
+                </Text>
+
+                <Text fontSize="var(--font-base)" color="var(--gray-600)" textAlign="center">
+                  Следите за статусом вашего заказа
+                </Text>
+
+                {/* Progress Steps */}
+                <Box position="relative" w="100%" maxW="300px" minH="300px">
+                  {/* Чекпоинты */}
+                  <Stack direction="column" gap="0" w="100%" align="stretch">
+                    {steps.map((step, index) => (
+                      <Box
+                        key={index}
+                        display="flex"
+                        alignItems="center"
+                        w="100%"
+                        position="relative"
+                        mt={index === 0 ? 0 : "var(--space-40)"}
+                        gap="var(--space-4)"
+                      >
+                        <Circle
+                          size="40px"
+                          bg={index <= currentStep ? 'var(--primary)' : 'var(--gray-200)'}
+                          color={index <= currentStep ? 'var(--white)' : 'var(--gray-500)'}
+                          transition="all 0.3s ease"
+                          zIndex={2}
+                          position="relative"
+                          mb="30px"
+                          flexShrink={0}
+                        >
+                          {index < currentStep ? (
+                            <Icon as={FiCheck} boxSize={5} />
+                          ) : (
+                            <Icon as={step.icon} boxSize={5} />
+                          )}
+                        </Circle>
+
+                        <Text
+                          fontSize="var(--font-base)"
+                          fontWeight={index <= currentStep ? 'var(--font-semibold)' : 'var(--font-normal)'}
+                          color={index <= currentStep ? 'var(--primary)' : 'var(--gray-500)'}
+                          transition="all 0.3s ease"
+                          flex={1}
+                          mb="20px"
+                        >
+                          {step.label}
+                        </Text>
+                      </Box>
+                    ))}
+                  </Stack>
+
+                  {/* Вертикальная полоска прогресса */}
+                  {steps.length > 1 && (
+                    <Box
+                      position="absolute"
+                      left="20px"
+                      top="20px"
+                      bottom="20px"
+                      w="4px"
+                      bg="var(--gray-200)"
+                      borderRadius="var(--radius-full)"
+                      zIndex={1}
+                    >
+                      <Box
+                        position="absolute"
+                        top="0"
+                        left="0"
+                        w="100%"
+                        h={`${(currentStep / (steps.length - 1)) * 100}%`}
+                        bg="var(--primary)"
+                        borderRadius="var(--radius-full)"
+                        transition="height 0.4s ease"
+                      />
+                    </Box>
+                  )}
+                </Box>
+
+                {currentStep === steps.length - 1 && (
+                  <VStack gap="var(--space-3)" align="center">
+                    <Text fontSize="var(--font-sm)" color="var(--accent)" textAlign="center">
+                      ✅ Заказ успешно оформлен!
+                    </Text>
+                    <Button
+                      onClick={handleCloseModal}
+                      bg="var(--primary)"
+                      color="var(--white)"
+                      size="sm"
+                      borderRadius="var(--radius-lg)"
+                      _hover={{ bg: 'var(--secondary)' }}
+                      cursor="pointer"
+                    >
+                      Понятно
+                    </Button>
+                  </VStack>
+                )}
+              </VStack>
+            </MotionBox>
+          </MotionBox>
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

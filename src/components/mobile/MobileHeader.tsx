@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
 import { FiSearch, FiShoppingBag, FiTruck, FiHome, FiMinus, FiPlus } from 'react-icons/fi';
@@ -23,6 +23,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const itemCount = getItemCount();
   const displayCount = itemCount > 10 ? '10+' : itemCount.toString();
@@ -94,6 +95,23 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
     router.push('/cart');
   };
 
+  // Закрытие dropdown при клике вне него
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+
+    if (showSearchDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSearchDropdown]);
+
 
   return (
     <Box
@@ -160,10 +178,8 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
           <Box
             position="relative"
             bg="var(--gray-100)"
-            borderRadius="var(--radius-full)"
             p="var(--space-2)"
             display="flex"
-            cursor="pointer"
             onClick={() => setOrderType(orderType === 'delivery' ? 'pickup' : 'delivery')}
             transition="all 0.3s ease"
             _hover={{
@@ -178,7 +194,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               w="calc(50% - var(--space-1))"
               h="calc(100% - var(--space-2))"
               bg="var(--primary)"
-              borderRadius="var(--radius-full)"
+              borderRadius="5px"
               transition="all 0.3s ease"
               boxShadow="var(--shadow-sm)"
             />
@@ -189,7 +205,6 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               justify="center"
               gap="var(--space-1)"
               p="var(--space-2)"
-              borderRadius="var(--radius-full)"
               position="relative"
               zIndex={1}
               color={orderType === 'delivery' ? 'var(--white)' : 'var(--gray-700)'}
@@ -207,7 +222,6 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
               justify="center"
               gap="var(--space-1)"
               p="var(--space-2)"
-              borderRadius="var(--radius-full)"
               position="relative"
               zIndex={1}
               color={orderType === 'pickup' ? 'var(--white)' : 'var(--gray-700)'}
@@ -310,6 +324,7 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
       {/* Dropdown с результатами поиска */}
       {showSearchDropdown && searchResults.length > 0 && (
         <MotionBox
+          ref={dropdownRef}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
@@ -362,11 +377,27 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
                                 <HStack justify="space-between" w="100%" align="flex-start">
                                   <VStack align="flex-start" gap="var(--space-1)" flex={1}>
                                     <HStack gap="var(--space-2)">
-                                      <Icon
-                                        as={categories.find(cat => cat.name === result.dish.category)?.icon}
-                                        boxSize={4}
-                                        color="var(--primary)"
-                                      />
+                                      {(() => {
+                                        // Mapping между категориями блюд и категориями ресторанов
+                                        const categoryMapping: Record<string, string> = {
+                                          'Пицца': 'Итальянская',
+                                          'Паста': 'Итальянская',
+                                          'Бургеры': 'Американская',
+                                          'Роллы': 'Японская',
+                                          'Азиатская': 'Японская',
+                                        };
+
+                                        const mappedCategoryName = categoryMapping[result.dish.category] || result.dish.category;
+                                        const category = categories.find(cat => cat.name === mappedCategoryName);
+                                        const iconComponent = category?.icon;
+                                        return iconComponent && typeof iconComponent === 'function' ? (
+                                          <Icon
+                                            as={iconComponent}
+                                            boxSize={4}
+                                            color="var(--primary)"
+                                          />
+                                        ) : null;
+                                      })()}
                                       <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
                                         {result.dish.name}
                                       </Text>

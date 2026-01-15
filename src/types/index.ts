@@ -6,6 +6,7 @@ export interface Restaurant {
   deliveryTime: string;
   deliveryFee: number;
   distance?: number; // в метрах
+  address: string;
   cuisines: string[];
   tags?: string[];
   isOpen: boolean;

@@ -313,7 +313,17 @@ export function DesktopHomePage() {
                           );
                         } else if (result.type === 'dish' && result.dish) {
                           const dish = result.dish;
-                          const categoryIcon = categories.find(cat => cat.name === dish.category)?.icon;
+                          // Mapping между категориями блюд и категориями ресторанов
+                          const categoryMapping: Record<string, string> = {
+                            'Пицца': 'Итальянская',
+                            'Паста': 'Итальянская',
+                            'Бургеры': 'Американская',
+                            'Роллы': 'Японская',
+                            'Азиатская': 'Японская',
+                          };
+
+                          const mappedCategoryName = categoryMapping[dish.category] || dish.category;
+                          const categoryIcon = categories.find(cat => cat.name === mappedCategoryName)?.icon;
                           return (
                             <Box
                               key={`dish-${dish.id}-${index}`}

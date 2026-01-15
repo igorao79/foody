@@ -1,27 +1,38 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Box, Text, HStack, Input, Button, VStack } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
-import { FiTag } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiTag, FiCheck, FiX } from 'react-icons/fi';
 
 const MotionBox = motion(Box);
 
 interface PromoCodeInputProps {
   currentPromo?: string;
-  onApplyPromo: (code: string) => void;
+  onApplyPromo: (code: string) => { success: boolean; error?: string };
   onRemovePromo: () => void;
 }
 
 export function PromoCodeInput({ currentPromo, onApplyPromo, onRemovePromo }: PromoCodeInputProps) {
   const [promoCode, setPromoCode] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleApply = () => {
     if (promoCode.trim()) {
-      onApplyPromo(promoCode.trim());
+      const result = onApplyPromo(promoCode.trim());
       setPromoCode('');
       setIsExpanded(false);
+
+      if (result.success) {
+        setNotification({ type: 'success', message: 'Промокод успешно применён!' });
+      } else {
+        setNotification({ type: 'error', message: result.error || 'Ошибка применения промокода' });
+      }
+
+      // Скрываем уведомление через 3 секунды
+      setTimeout(() => setNotification(null), 3000);
     }
   };
 
@@ -148,6 +159,45 @@ export function PromoCodeInput({ currentPromo, onApplyPromo, onRemovePromo }: Pr
             </Button>
           </VStack>
         </MotionBox>
+      )}
+
+      {/* Notification Portal */}
+      {notification && createPortal(
+        <AnimatePresence>
+          <MotionBox
+            initial={{ opacity: 0, x: 300 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 300 }}
+            transition={{ duration: 0.3 }}
+            position="fixed"
+            top="var(--space-4)"
+            right="var(--space-4)"
+            zIndex={9999}
+            minW="300px"
+            maxW="400px"
+          >
+            <Box
+              p="var(--space-4)"
+              borderRadius="var(--radius-lg)"
+              bg={notification.type === 'success' ? 'var(--accent)' : 'var(--red-500)'}
+              color="var(--white)"
+              boxShadow="var(--shadow-lg)"
+              border="1px solid rgba(255,255,255,0.2)"
+            >
+              <HStack gap="var(--space-3)" align="center">
+                {notification.type === 'success' ? (
+                  <FiCheck size={20} />
+                ) : (
+                  <FiX size={20} />
+                )}
+                <Text fontSize="var(--font-base)" fontWeight="var(--font-medium)">
+                  {notification.message}
+                </Text>
+              </HStack>
+            </Box>
+          </MotionBox>
+        </AnimatePresence>,
+        document.body
       )}
     </VStack>
   );

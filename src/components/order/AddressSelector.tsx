@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Text, VStack, HStack, Button, Input, Textarea } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Button, Input, Textarea, Icon } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiMapPin, FiPlus } from 'react-icons/fi';
 import { OrderAddress } from '@/types';
@@ -37,13 +37,13 @@ export function AddressSelector({ selectedAddress, onAddressSelect, onAddNewAddr
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
 
   return (
-    <VStack align="stretch" spacing="var(--space-4)">
+    <VStack align="stretch" gap="var(--space-4)">
       <Text fontSize="var(--font-lg)" fontWeight="var(--font-semibold)" color="var(--primary)">
         Адрес доставки
       </Text>
 
       {/* Существующие адреса */}
-      <VStack align="stretch" spacing="var(--space-2)">
+      <VStack align="stretch" gap="var(--space-2)">
         {mockAddresses.map((address) => (
           <MotionBox
             key={address.id}
@@ -55,15 +55,14 @@ export function AddressSelector({ selectedAddress, onAddressSelect, onAddNewAddr
             border={selectedAddress?.id === address.id ? '2px solid var(--primary)' : '1px solid var(--gray-200)'}
             bg={selectedAddress?.id === address.id ? 'var(--gray-50)' : 'var(--white)'}
             textAlign="left"
-            transition="all 0.2s ease"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <HStack spacing="var(--space-3)" align="flex-start">
+            <HStack gap="var(--space-3)" align="flex-start">
               <Box color="var(--primary)" mt="2px">
                 <FiMapPin size={20} />
               </Box>
-              <VStack align="flex-start" spacing="var(--space-1)" flex={1}>
+              <VStack align="flex-start" gap="var(--space-1)" flex={1}>
                 <Text fontSize="var(--font-base)" fontWeight="var(--font-medium)" color="var(--primary)">
                   {address.street}, кв. {address.apartment}
                 </Text>
@@ -91,7 +90,6 @@ export function AddressSelector({ selectedAddress, onAddressSelect, onAddNewAddr
         borderRadius="var(--radius-lg)"
         py="var(--space-4)"
         fontSize="var(--font-base)"
-        leftIcon={<FiPlus />}
         onClick={onAddNewAddress}
         cursor="pointer"
         _hover={{
@@ -100,7 +98,10 @@ export function AddressSelector({ selectedAddress, onAddressSelect, onAddNewAddr
           borderColor: 'var(--primary)',
         }}
       >
-        Добавить новый адрес
+        <HStack gap="var(--space-2)">
+          <Icon as={FiPlus} />
+          <Text>Добавить новый адрес</Text>
+        </HStack>
       </Button>
     </VStack>
   );
