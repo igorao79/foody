@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import { Box, Text, HStack, Icon, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { FiGift, FiPercent, FiStar, FiZap } from 'react-icons/fi';
@@ -71,7 +71,7 @@ export function PersonalOffersMarquee() {
         overflow="hidden"
         bg="linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)"
         borderRadius="var(--radius-lg)"
-        p="var(--space-3)"
+        p="var(--space-4)"
         mb="var(--space-4)"
         boxShadow="var(--shadow-md)"
         _hover={{
@@ -140,15 +140,9 @@ export function PersonalOffersMarquee() {
           textAlign="center"
           py="var(--space-1)"
         >
-          <HStack justify="center" gap="var(--space-2)">
-            <Icon as={FiGift} boxSize={4} color="var(--white)" />
-            <Text fontSize="var(--font-sm)" fontWeight="var(--font-bold)" color="var(--white)">
-              Персональные предложения
-            </Text>
-            <Text fontSize="var(--font-sm)" color="rgba(255,255,255,0.8)">
-              Нажмите, чтобы посмотреть все
-            </Text>
-          </HStack>
+          <Text fontSize="var(--font-sm)" color="rgba(255,255,255,0.9)" fontWeight="var(--font-medium)">
+            Нажмите, чтобы посмотреть все предложения
+          </Text>
         </Box>
       </Box>
 

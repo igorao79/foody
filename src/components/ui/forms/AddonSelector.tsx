@@ -3,7 +3,13 @@
 import React from 'react';
 import { Box, Text, VStack, HStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { DishAddon } from '@/types';
+// Local type definition
+interface DishAddon {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+}
 
 const MotionBox = motion(Box);
 

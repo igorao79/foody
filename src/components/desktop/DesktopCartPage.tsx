@@ -2,12 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { Box, VStack, Text, HStack, Button, Container, Grid, GridItem, Icon } from '@chakra-ui/react';
-import { FiShoppingCart } from 'react-icons/fi';
+import { FiShoppingCart, FiMapPin } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { CartItem } from '@/components/cart/CartItem';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { DesktopHeader } from './DesktopHeader';
 import { useCart } from '@/contexts/CartContext';
+import { restaurants } from '@/utils/mockData';
 
 const MotionBox = motion(Box);
 
@@ -27,6 +28,16 @@ export function DesktopCartPage() {
   const handlePromoRemove = () => {
     removePromo();
   };
+
+  // Группируем товары по ресторанам
+  const groupedItems = cart.items.reduce((acc, item) => {
+    const restaurantId = item.dish.restaurantId;
+    if (!acc[restaurantId]) {
+      acc[restaurantId] = [];
+    }
+    acc[restaurantId].push(item);
+    return acc;
+  }, {} as Record<string, typeof cart.items>);
 
   if (cart.items.length === 0) {
     return (
@@ -103,14 +114,41 @@ export function DesktopCartPage() {
           {/* Левая колонка - товары */}
           <GridItem>
             <VStack align="stretch" gap="var(--space-4)">
-              {cart.items.map((item) => (
-                <CartItem
-                  key={item.id}
-                  item={item}
-                  onUpdateQuantity={updateItem}
-                  onRemove={removeItem}
-                />
-              ))}
+              {Object.entries(groupedItems).map(([restaurantId, items], index, array) => {
+                const restaurant = restaurants.find(r => r.id === restaurantId);
+                return (
+                  <VStack key={restaurantId} align="stretch" gap="var(--space-4)">
+                    {/* Название ресторана */}
+                    <HStack gap="var(--space-2)" align="center">
+                      <Icon as={FiMapPin} boxSize={4} color="var(--gray-500)" />
+                      <Text
+                        fontSize="var(--font-lg)"
+                        fontWeight="var(--font-semibold)"
+                        color="var(--primary)"
+                      >
+                        {restaurant?.name || 'Ресторан не найден'}
+                      </Text>
+                    </HStack>
+
+                    {/* Товары из этого ресторана */}
+                    <VStack align="stretch" gap="var(--space-4)">
+                      {items.map((item) => (
+                        <CartItem
+                          key={item.id}
+                          item={item}
+                          onUpdateQuantity={updateItem}
+                          onRemove={removeItem}
+                        />
+                      ))}
+                    </VStack>
+
+                    {/* Разделительная линия, кроме последнего ресторана */}
+                    {index < array.length - 1 && (
+                      <Box borderTop="2px solid var(--gray-300)" my="var(--space-4)" />
+                    )}
+                  </VStack>
+                );
+              })}
             </VStack>
           </GridItem>
 

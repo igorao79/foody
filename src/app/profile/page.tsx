@@ -73,7 +73,7 @@ export default function ProfilePage() {
         <DesktopHeader showOrderType={false} />
       ) : (
         <Layout showBottomNav={false}>
-          <Header title="Профиль" showBackButton />
+          <Header title="Профиль" showBackButton showCart />
         </Layout>
       )}
 

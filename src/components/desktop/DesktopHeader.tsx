@@ -3,18 +3,26 @@
 import { useState } from 'react';
 import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
 import { FiSearch, FiUser, FiShoppingBag, FiTruck, FiHome } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useCart } from '@/contexts/CartContext';
 
 interface DesktopHeaderProps {
   onSearch?: (query: string) => void;
   showOrderType?: boolean;
 }
 
+const MotionBox = motion(Box);
+
 export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderProps) {
   const router = useRouter();
+  const { getItemCount } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
   const [orderType, setOrderType] = useState('delivery');
+
+  const itemCount = getItemCount();
+  const displayCount = itemCount > 10 ? '10+' : itemCount.toString();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -69,7 +77,10 @@ export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderP
                     alt="Фуди"
                     width={32}
                     height={32}
-                    style={{ objectFit: 'contain' }}
+                    style={{
+                      objectFit: 'contain',
+                      borderRadius: 'var(--radius-md)'
+                    }}
                   />
                 </Box>
                 <VStack align="flex-start" gap={0}>
@@ -215,21 +226,49 @@ export function DesktopHeader({ onSearch, showOrderType = true }: DesktopHeaderP
               <FiUser size={20} />
             </Box>
 
-            <Box
-              as="button"
-              aria-label="Корзина"
-              onClick={handleCartClick}
-              p="var(--space-3)"
-              borderRadius="var(--radius-md)"
-              color="var(--gray-600)"
-              cursor="pointer"
-              _hover={{
-                bg: 'var(--gray-100)',
-                color: 'var(--primary)',
-              }}
-              transition="all 0.2s ease"
-            >
-              <FiShoppingBag size={20} />
+            <Box position="relative">
+              <Box
+                as="button"
+                aria-label="Корзина"
+                onClick={handleCartClick}
+                p="var(--space-3)"
+                borderRadius="var(--radius-md)"
+                color="var(--gray-600)"
+                cursor="pointer"
+                _hover={{
+                  bg: 'var(--gray-100)',
+                  color: 'var(--primary)',
+                }}
+                transition="all 0.2s ease"
+              >
+                <FiShoppingBag size={20} />
+              </Box>
+              <AnimatePresence>
+                {itemCount > 0 && (
+                  <MotionBox
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    position="absolute"
+                    top="-2px"
+                    right="-2px"
+                    bg="var(--primary)"
+                    color="var(--white)"
+                    borderRadius="var(--radius-full)"
+                    minW="18px"
+                    h="18px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="var(--font-xs)"
+                    fontWeight="var(--font-bold)"
+                    px="var(--space-1)"
+                    boxShadow="0 2px 8px rgba(5, 56, 107, 0.3)"
+                  >
+                    {displayCount}
+                  </MotionBox>
+                )}
+              </AnimatePresence>
             </Box>
           </HStack>
         </HStack>

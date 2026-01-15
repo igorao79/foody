@@ -145,10 +145,12 @@ interface CartContextType {
   addItem: (dish: Dish, quantity: number, selectedSize?: DishSize, selectedAddons?: DishAddon[]) => void;
   updateItem: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
+  removeItemByDishId: (dishId: string) => void;
   clearCart: () => void;
   applyPromo: (code: string, discount: number) => void;
   removePromo: () => void;
   getItemCount: () => number;
+  getItemQuantity: (dishId: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -168,6 +170,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'REMOVE_ITEM', payload: { id } });
   };
 
+  const removeItemByDishId = (dishId: string) => {
+    // Находим первый item с данным dishId и уменьшаем его количество на 1
+    const item = cart.items.find(item => item.id.startsWith(`${dishId}-`));
+    if (item) {
+      if (item.quantity > 1) {
+        updateItem(item.id, item.quantity - 1);
+      } else {
+        removeItem(item.id);
+      }
+    }
+  };
+
   const clearCart = () => {
     dispatch({ type: 'CLEAR_CART' });
   };
@@ -184,6 +198,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return cart.items.reduce((sum, item) => sum + item.quantity, 0);
   };
 
+  const getItemQuantity = (dishId: string) => {
+    // Ищем все items, которые начинаются с dishId (учитывая размеры и добавки)
+    const items = cart.items.filter(item => item.id.startsWith(`${dishId}-`));
+    return items.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -191,10 +211,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addItem,
         updateItem,
         removeItem,
+        removeItemByDishId,
         clearCart,
         applyPromo,
         removePromo,
         getItemCount,
+        getItemQuantity,
       }}
     >
       {children}

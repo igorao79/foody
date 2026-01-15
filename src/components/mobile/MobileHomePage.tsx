@@ -2,19 +2,23 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Text, VStack, HStack } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Icon } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { CategoryScroll } from '@/components/ui/navigation/CategoryScroll';
 import { PromoBanner } from '@/components/ui/cards/PromoBanner';
 import { RestaurantCard } from '@/components/ui/cards/RestaurantCard';
 import { PersonalOffersMarquee } from '@/components/ui/carousel/PersonalOffersMarquee';
-import { categories, promoBanners, restaurants } from '@/utils/mockData';
+import { categories, promoBanners, restaurants, dishes } from '@/utils/mockData';
+import { useCart } from '@/contexts/CartContext';
 
 const MotionBox = motion(Box);
 
-export function MobileHomePage() {
+export function MobileHomePage({ onSearch }: { onSearch?: (query: string) => void }) {
   const router = useRouter();
+  const { addItem } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<string>();
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   const handleRestaurantClick = (restaurantId: string) => {
     router.push(`/restaurant/${restaurantId}`);
@@ -26,6 +30,51 @@ export function MobileHomePage() {
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId === selectedCategory ? undefined : categoryId);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    onSearch?.(query);
+
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const lowerQuery = query.toLowerCase().trim();
+
+    // Поиск по блюдам
+    const matchingDishes = dishes.filter(dish =>
+      dish.name.toLowerCase().includes(lowerQuery) ||
+      dish.description.toLowerCase().includes(lowerQuery) ||
+      dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
+      dish.category.toLowerCase().includes(lowerQuery)
+    );
+
+    // Группируем результаты по ресторанам
+    const dishResults = matchingDishes.map(dish => {
+      const restaurant = restaurants.find(r => r.id === dish.restaurantId);
+      return {
+        type: 'dish',
+        dish,
+        restaurant
+      };
+    });
+
+    // Поиск по ресторанам
+    const matchingRestaurants = restaurants.filter(restaurant =>
+      restaurant.name.toLowerCase().includes(lowerQuery) ||
+      restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
+      restaurant.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+      restaurant.description?.toLowerCase().includes(lowerQuery)
+    );
+
+    const restaurantResults = matchingRestaurants.map(restaurant => ({
+      type: 'restaurant',
+      restaurant
+    }));
+
+    setSearchResults([...dishResults, ...restaurantResults]);
   };
 
   // Фильтрация ресторанов по выбранной категории

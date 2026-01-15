@@ -85,7 +85,7 @@ export default function DishPage() {
         transition={{ duration: 0.5 }}
       >
         {/* Header */}
-        <Header showBackButton />
+        <Header showBackButton showCart />
 
         {/* Dish Image */}
         <Box p="var(--space-4)">

@@ -6,6 +6,7 @@ export interface Restaurant {
   deliveryTime: string;
   deliveryFee: number;
   cuisines: string[];
+  tags?: string[];
   isOpen: boolean;
   description?: string;
 }
@@ -18,6 +19,7 @@ export interface Dish {
   image: string;
   category: string;
   ingredients: string[];
+  restaurantId: string;
   isVegetarian?: boolean;
   isSpicy?: boolean;
   isPopular?: boolean;

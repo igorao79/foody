@@ -3,22 +3,90 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, HStack, VStack, Text, Input, Icon } from '@chakra-ui/react';
-import { FiSearch, FiShoppingBag, FiTruck, FiHome } from 'react-icons/fi';
+import { FiSearch, FiShoppingBag, FiTruck, FiHome, FiMinus, FiPlus } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { useCart } from '@/contexts/CartContext';
+import { restaurants, dishes, categories } from '@/utils/mockData';
 
 interface MobileHeaderProps {
   onSearch?: (query: string) => void;
 }
 
+const MotionBox = motion(Box);
+
 export function MobileHeader({ onSearch }: MobileHeaderProps) {
   const router = useRouter();
+  const { getItemCount, addItem, getItemQuantity, removeItemByDishId } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
   const [orderType, setOrderType] = useState('delivery');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+
+  const itemCount = getItemCount();
+  const displayCount = itemCount > 10 ? '10+' : itemCount.toString();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
     onSearch?.(query);
+
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    const lowerQuery = query.toLowerCase().trim();
+
+    // Поиск по блюдам
+    const matchingDishes = dishes.filter(dish =>
+      dish.name.toLowerCase().includes(lowerQuery) ||
+      dish.description.toLowerCase().includes(lowerQuery) ||
+      dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
+      dish.category.toLowerCase().includes(lowerQuery)
+    );
+
+    // Группируем результаты по ресторанам
+    const dishResults = matchingDishes
+      .map(dish => {
+        const restaurant = restaurants.find(r => r.id === dish.restaurantId);
+        return restaurant ? {
+          type: 'dish',
+          dish,
+          restaurant
+        } : null;
+      })
+      .filter(Boolean);
+
+    // Поиск по ресторанам
+    const matchingRestaurants = restaurants.filter(restaurant =>
+      restaurant.name.toLowerCase().includes(lowerQuery) ||
+      restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
+      restaurant.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+      restaurant.description?.toLowerCase().includes(lowerQuery)
+    );
+
+    const restaurantResults = matchingRestaurants.map(restaurant => ({
+      type: 'restaurant',
+      restaurant
+    }));
+
+    const allResults = [...dishResults, ...restaurantResults];
+    setSearchResults(allResults);
+    setShowSearchDropdown(allResults.length > 0);
+  };
+
+  const handleDishClick = (dish?: any) => {
+    // Теперь блюда добавляются через кнопки + в dropdown
+    // Этот обработчик можно оставить пустым или удалить
+  };
+
+  const handleRestaurantClickFromSearch = (restaurantId: string) => {
+    setShowSearchDropdown(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    router.push(`/restaurant/${restaurantId}`);
   };
 
   const handleCartClick = () => {
@@ -61,7 +129,10 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
                   alt="Фуди"
                   width={24}
                   height={24}
-                  style={{ objectFit: 'contain' }}
+                  style={{
+                    objectFit: 'contain',
+                    borderRadius: 'var(--radius-md)'
+                  }}
                 />
               </Box>
               <VStack align="flex-start" gap={0}>
@@ -179,27 +250,199 @@ export function MobileHeader({ onSearch }: MobileHeaderProps) {
             </Box>
           </Box>
 
-            <Box
-              as="button"
-              aria-label="Корзина"
-              onClick={handleCartClick}
-              p="var(--space-3)"
-              border="2px solid var(--gray-200)"
-              borderRadius="var(--radius-lg)"
-              bg="transparent"
-              color="var(--primary)"
-              cursor="pointer"
-              _hover={{
-                bg: 'var(--primary)',
-                color: 'var(--white)',
-                borderColor: 'var(--primary)',
-              }}
-              transition="all 0.2s ease"
-            >
-              <FiShoppingBag size={20} />
+            <Box position="relative">
+              <Box
+                as="button"
+                aria-label="Корзина"
+                onClick={handleCartClick}
+                p="var(--space-3)"
+                border="2px solid var(--gray-200)"
+                borderRadius="var(--radius-lg)"
+                bg="transparent"
+                color="var(--primary)"
+                cursor="pointer"
+                _hover={{
+                  bg: 'var(--primary)',
+                  color: 'var(--white)',
+                  borderColor: 'var(--primary)',
+                }}
+                transition="all 0.2s ease"
+              >
+                <FiShoppingBag size={20} />
+              </Box>
+              <AnimatePresence>
+                {itemCount > 0 && (
+                  <MotionBox
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    position="absolute"
+                    top="-2px"
+                    right="-2px"
+                    bg="var(--primary)"
+                    color="var(--white)"
+                    borderRadius="var(--radius-full)"
+                    minW="18px"
+                    h="18px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="var(--font-xs)"
+                    fontWeight="var(--font-bold)"
+                    px="var(--space-1)"
+                    boxShadow="0 2px 8px rgba(5, 56, 107, 0.3)"
+                  >
+                    {displayCount}
+                  </MotionBox>
+                )}
+              </AnimatePresence>
             </Box>
         </HStack>
       </Box>
+
+      {/* Dropdown с результатами поиска */}
+      {showSearchDropdown && searchResults.length > 0 && (
+        <MotionBox
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          position="absolute"
+          top="100%"
+          left="var(--space-4)"
+          right="var(--space-4)"
+          bg="var(--white)"
+          borderRadius="var(--radius-lg)"
+          boxShadow="var(--shadow-xl)"
+          border="1px solid var(--gray-200)"
+          zIndex={100}
+          maxH="300px"
+          overflowY="auto"
+        >
+          <VStack align="stretch" gap={0}>
+            {searchResults.slice(0, 6).map((result, index) => {
+              if (result.type === 'restaurant') {
+                return (
+                  <Box
+                    key={`restaurant-${result.restaurant.id}`}
+                    p="var(--space-3)"
+                    cursor="pointer"
+                    _hover={{ bg: 'var(--gray-50)' }}
+                    onClick={() => handleRestaurantClickFromSearch(result.restaurant.id)}
+                    borderBottom={index < searchResults.length - 1 ? "1px solid var(--gray-100)" : "none"}
+                  >
+                              <HStack gap="var(--space-3)">
+                                <Icon as={FiShoppingBag} boxSize={4} color="var(--primary)" />
+                                <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                                  {result.restaurant.name}
+                                </Text>
+                                <Text fontSize="var(--font-sm)" color="var(--gray-500)">
+                                  Ресторан
+                                </Text>
+                              </HStack>
+                  </Box>
+                );
+              } else if (result.dish) {
+                return (
+                  <Box
+                    key={`dish-${result.dish.id}-${index}`}
+                    p="var(--space-3)"
+                    cursor="pointer"
+                    _hover={{ bg: 'var(--gray-50)' }}
+                    onClick={() => handleDishClick(result.dish)}
+                    borderBottom={index < searchResults.length - 1 ? "1px solid var(--gray-100)" : "none"}
+                  >
+                              <VStack align="flex-start" gap="var(--space-1)">
+                                <HStack justify="space-between" w="100%" align="flex-start">
+                                  <VStack align="flex-start" gap="var(--space-1)" flex={1}>
+                                    <HStack gap="var(--space-2)">
+                                      <Icon
+                                        as={categories.find(cat => cat.name === result.dish.category)?.icon}
+                                        boxSize={4}
+                                        color="var(--primary)"
+                                      />
+                                      <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                                        {result.dish.name}
+                                      </Text>
+                                    </HStack>
+                                    <Text fontSize="var(--font-sm)" color="var(--gray-600)" style={{
+                                      display: '-webkit-box',
+                                      WebkitLineClamp: 1,
+                                      WebkitBoxOrient: 'vertical' as const,
+                                      overflow: 'hidden'
+                                    }}>
+                                      от {result.restaurant?.name}
+                                    </Text>
+                                  </VStack>
+                                  <HStack gap="var(--space-1)" align="center">
+                                    <Box
+                                      as="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const currentQuantity = getItemQuantity(result.dish.id);
+                                        if (currentQuantity > 0) {
+                                          removeItemByDishId(result.dish.id);
+                                        }
+                                      }}
+                                      w="24px"
+                                      h="24px"
+                                      bg="var(--gray-100)"
+                                      color="var(--gray-700)"
+                                      borderRadius="var(--radius-full)"
+                                      display="flex"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      _hover={{ bg: 'var(--gray-200)' }}
+                                      _active={{ transform: 'scale(0.9)' }}
+                                      opacity={getItemQuantity(result.dish.id) === 0 ? 0.5 : 1}
+                                      cursor={getItemQuantity(result.dish.id) === 0 ? 'not-allowed' : 'pointer'}
+                                      transition="all 0.2s ease"
+                                    >
+                                      <FiMinus size={12} />
+                                    </Box>
+                                    <Text
+                                      fontSize="var(--font-sm)"
+                                      fontWeight="var(--font-bold)"
+                                      color="var(--gray-700)"
+                                      minW="20px"
+                                      textAlign="center"
+                                    >
+                                      {getItemQuantity(result.dish.id)}
+                                    </Text>
+                                    <Box
+                                      as="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        addItem(result.dish, 1);
+                                      }}
+                                      w="24px"
+                                      h="24px"
+                                      bg="var(--gray-100)"
+                                      color="var(--gray-700)"
+                                      borderRadius="var(--radius-full)"
+                                      display="flex"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      _hover={{ bg: 'var(--gray-200)' }}
+                                      _active={{ transform: 'scale(0.9)' }}
+                                      transition="all 0.2s ease"
+                                      cursor="pointer"
+                                    >
+                                      <FiPlus size={12} />
+                                    </Box>
+                                  </HStack>
+                                </HStack>
+                                <Text fontSize="var(--font-sm)" fontWeight="var(--font-semibold)" color="var(--primary)" textAlign="right">
+                                  {result.dish.price}₽
+                                </Text>
+                              </VStack>
+                  </Box>
+                );
+              }
+              return null;
+            })}
+          </VStack>
+        </MotionBox>
+      )}
     </Box>
   );
 }

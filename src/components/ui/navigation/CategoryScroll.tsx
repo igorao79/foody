@@ -3,7 +3,13 @@
 import React from 'react';
 import { Box, Text, VStack, Icon, useBreakpointValue } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Category } from '@/types';
+// Local type definition
+interface Category {
+  id: string;
+  name: string;
+  icon: any;
+  color: string;
+}
 
 const MotionBox = motion(Box);
 

@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Box, Text, HStack, VStack, Icon } from '@chakra-ui/react';
-import { FiCoffee, FiZap } from 'react-icons/fi';
+import { useState, useMemo } from 'react';
+import { Box, Text, HStack, VStack, Icon, Input } from '@chakra-ui/react';
+import { FiCoffee, FiZap, FiSearch } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Dish } from '@/types';
+import { DishModal } from '@/components/ui/modals/DishModal';
+import { CompactQuantitySelector } from '@/components/ui/forms/CompactQuantitySelector';
+import { useCart } from '@/contexts/CartContext';
 
 const MotionBox = motion(Box);
 
@@ -14,20 +17,85 @@ interface MenuTabsProps {
 }
 
 export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
+  const { getItemQuantity } = useCart();
   const [activeTab, setActiveTab] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Группируем блюда по категориям
   const categories = ['all', ...Array.from(new Set(dishes.map(dish => dish.category)))];
-  const filteredDishes = activeTab === 'all'
-    ? dishes
-    : dishes.filter(dish => dish.category === activeTab);
+  const filteredDishes = useMemo(() => {
+    let result = activeTab === 'all'
+      ? dishes
+      : dishes.filter(dish => dish.category === activeTab);
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter(dish =>
+        dish.name.toLowerCase().includes(query) ||
+        dish.description.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
+  }, [dishes, activeTab, searchQuery]);
 
   const handleTabClick = (category: string) => {
     setActiveTab(category);
   };
 
+  const handleDishClick = (dish: Dish) => {
+    setSelectedDish(dish);
+    setIsModalOpen(true);
+  };
+
+  const handleQuantityChange = (dishId: string, quantity: number) => {
+    // Обновление количества обрабатывается в CompactQuantitySelector через CartContext
+  };
+
   return (
     <Box>
+      {/* Поиск */}
+      <Box
+        px="var(--space-4)"
+        py="var(--space-3)"
+        bg="var(--white)"
+        borderBottom="1px solid var(--gray-200)"
+      >
+        <Box position="relative">
+          <Input
+            placeholder="Найти блюдо..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            bg="var(--gray-50)"
+            border="1px solid var(--gray-200)"
+            borderRadius="var(--radius-lg)"
+            fontSize="var(--font-base)"
+            px="var(--space-4)"
+            py="var(--space-3)"
+            pl="50px"
+            _focus={{
+              borderColor: 'var(--primary)',
+              boxShadow: 'var(--shadow-sm)',
+              bg: 'var(--white)',
+            }}
+            _hover={{
+              borderColor: 'var(--gray-300)',
+            }}
+          />
+          <Box
+            position="absolute"
+            left="var(--space-3)"
+            top="50%"
+            transform="translateY(-50%)"
+            color="var(--gray-400)"
+          >
+            <FiSearch size={20} />
+          </Box>
+        </Box>
+      </Box>
+
       {/* Табы */}
       <Box
         px="var(--space-4)"
@@ -69,20 +137,19 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
 
       {/* Список блюд */}
       <VStack gap={0} bg="var(--white)">
-        {filteredDishes.map((dish) => (
-          <MotionBox
-            key={dish.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            as="button"
-            onClick={() => onDishClick?.(dish)}
-            w="100%"
-            p="var(--space-4)"
-            borderBottom="1px solid var(--gray-100)"
-            _hover={{ bg: 'var(--gray-50)' }}
-            _last={{ borderBottom: 'none' }}
-            textAlign="left"
-          >
+        {filteredDishes.map((dish) => {
+          const quantity = getItemQuantity(dish.id);
+          return (
+            <MotionBox
+              key={dish.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              w="100%"
+              p="var(--space-4)"
+              borderBottom="1px solid var(--gray-100)"
+              _last={{ borderBottom: 'none' }}
+              textAlign="left"
+            >
             <HStack gap="var(--space-4)" align="flex-start">
               {/* Фото блюда */}
               <Box
@@ -138,51 +205,55 @@ export function MenuTabs({ dishes, onDishClick }: MenuTabsProps) {
                     </Text>
                     <HStack gap="var(--space-2)">
                       {dish.isPopular && (
-                        <Text
-                          fontSize="var(--font-xs)"
-                          color="var(--accent)"
-                          fontWeight="var(--font-medium)"
-                        >
+                        <Text fontSize="var(--font-xs)" color="var(--accent)" fontWeight="var(--font-medium)">
                           🔥 Популярное
                         </Text>
                       )}
                       {dish.isVegetarian && (
-                        <Text
-                          fontSize="var(--font-xs)"
-                          color="var(--secondary)"
-                          fontWeight="var(--font-medium)"
-                        >
+                        <Text fontSize="var(--font-xs)" color="var(--secondary)" fontWeight="var(--font-medium)">
                           🌱 Вегетарианское
                         </Text>
                       )}
-                                  {dish.isSpicy && (
-                                    <HStack gap="var(--space-1)" align="center">
-                                      <Icon as={FiZap} boxSize={3} color="var(--primary)" />
-                                      <Text
-                                        fontSize="var(--font-xs)"
-                                        color="var(--primary)"
-                                        fontWeight="var(--font-medium)"
-                                      >
-                                        Острый
-                                      </Text>
-                                    </HStack>
-                                  )}
+                      {dish.isSpicy && (
+                        <HStack gap="var(--space-1)" align="center">
+                          <Icon as={FiZap} boxSize={3} color="var(--primary)" />
+                          <Text fontSize="var(--font-xs)" color="var(--primary)" fontWeight="var(--font-medium)">
+                            Острый
+                          </Text>
+                        </HStack>
+                      )}
                     </HStack>
                   </VStack>
 
-                  <Text
-                    fontSize="var(--font-lg)"
-                    fontWeight="var(--font-bold)"
-                    color="var(--primary)"
-                  >
-                    {dish.price}₽
-                  </Text>
+                  <VStack align="center" gap="var(--space-1)">
+                    <Text
+                      fontSize="var(--font-lg)"
+                      fontWeight="var(--font-bold)"
+                      color="var(--primary)"
+                      textAlign="center"
+                    >
+                      {dish.price}₽
+                    </Text>
+                    <CompactQuantitySelector
+                      dish={dish}
+                      quantity={quantity}
+                      onQuantityChange={(newQuantity) => handleQuantityChange(dish.id, newQuantity)}
+                    />
+                  </VStack>
                 </HStack>
               </VStack>
             </HStack>
           </MotionBox>
-        ))}
+          );
+        })}
       </VStack>
+
+      {/* Модальное окно блюда */}
+      <DishModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        dish={selectedDish}
+      />
     </Box>
   );
 }

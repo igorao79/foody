@@ -1,22 +1,17 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Box, VStack, HStack, Text, Container, Grid, GridItem, Badge, Icon } from '@chakra-ui/react';
 import { FiHome } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { MenuTabs } from '@/components/restaurant/MenuTabs';
-import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
 import { DesktopHeader } from './DesktopHeader';
-import { useCart } from '@/contexts/CartContext';
 import { restaurants, dishes } from '@/utils/mockData';
-import { Dish } from '@/types';
 
 const MotionBox = motion(Box);
 
 export function DesktopRestaurantPage() {
   const params = useParams();
-  const router = useRouter();
-  const { cart, getItemCount } = useCart();
 
   const restaurantId = params?.id as string;
   const restaurant = restaurants.find(r => r.id === restaurantId);
@@ -31,13 +26,10 @@ export function DesktopRestaurantPage() {
     );
   }
 
-  const handleDishClick = (dish: Dish) => {
-    router.push(`/dish/${dish.id}?restaurant=${restaurantId}`);
-  };
+  // Фильтруем блюда по restaurantId
+  const restaurantDishes = dishes.filter(dish => dish.restaurantId === restaurantId);
 
-  const handleCartClick = () => {
-    router.push('/cart');
-  };
+  // handleDishClick больше не используется, модальное окно открывается в MenuTabs
 
   return (
     <>
@@ -158,19 +150,11 @@ export function DesktopRestaurantPage() {
               overflow="hidden"
             >
               <MenuTabs
-                dishes={dishes}
-                onDishClick={handleDishClick}
+                dishes={restaurantDishes}
               />
             </Box>
           </GridItem>
         </Grid>
-
-          {/* Floating Cart Button */}
-          <FloatingCartButton
-            itemCount={getItemCount()}
-            totalPrice={cart.total}
-            onClick={handleCartClick}
-          />
         </MotionBox>
       </Container>
     </>

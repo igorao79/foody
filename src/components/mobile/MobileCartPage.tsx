@@ -1,13 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, VStack, Text, HStack, Button, Icon } from '@chakra-ui/react';
-import { FiShoppingCart } from 'react-icons/fi';
+import { Box, VStack, Text, HStack, Button, Icon, Divider } from '@chakra-ui/react';
+import { FiShoppingCart, FiMapPin } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/ui/navigation/Header';
 import { CartItem } from '@/components/cart/CartItem';
 import { PromoCodeInput } from '@/components/cart/PromoCodeInput';
 import { useCart } from '@/contexts/CartContext';
+import { restaurants } from '@/utils/mockData';
 
 const MotionBox = motion(Box);
 
@@ -27,6 +28,16 @@ export function MobileCartPage() {
   const handlePromoRemove = () => {
     removePromo();
   };
+
+  // Группируем товары по ресторанам
+  const groupedItems = cart.items.reduce((acc, item) => {
+    const restaurantId = item.dish.restaurantId;
+    if (!acc[restaurantId]) {
+      acc[restaurantId] = [];
+    }
+    acc[restaurantId].push(item);
+    return acc;
+  }, {} as Record<string, typeof cart.items>);
 
   if (cart.items.length === 0) {
     return (
@@ -95,16 +106,43 @@ export function MobileCartPage() {
 
       <Box p="var(--space-4)" pb="120px">
         <VStack align="stretch" gap="var(--space-4)">
-          {/* Список товаров */}
-          <VStack align="stretch" gap="var(--space-3)">
-            {cart.items.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onUpdateQuantity={updateItem}
-                onRemove={removeItem}
-              />
-            ))}
+          {/* Список товаров по ресторанам */}
+          <VStack align="stretch" gap="var(--space-4)">
+            {Object.entries(groupedItems).map(([restaurantId, items], index, array) => {
+              const restaurant = restaurants.find(r => r.id === restaurantId);
+              return (
+                <VStack key={restaurantId} align="stretch" gap="var(--space-3)">
+                  {/* Название ресторана */}
+                  <HStack gap="var(--space-2)" align="center">
+                    <Icon as={FiMapPin} boxSize={4} color="var(--gray-500)" />
+                    <Text
+                      fontSize="var(--font-lg)"
+                      fontWeight="var(--font-semibold)"
+                      color="var(--primary)"
+                    >
+                      {restaurant?.name || 'Ресторан не найден'}
+                    </Text>
+                  </HStack>
+
+                  {/* Товары из этого ресторана */}
+                  <VStack align="stretch" gap="var(--space-3)">
+                    {items.map((item) => (
+                      <CartItem
+                        key={item.id}
+                        item={item}
+                        onUpdateQuantity={updateItem}
+                        onRemove={removeItem}
+                      />
+                    ))}
+                  </VStack>
+
+                  {/* Разделительная линия, кроме последнего ресторана */}
+                  {index < array.length - 1 && (
+                    <Box borderTop="2px solid var(--gray-300)" my="var(--space-3)" />
+                  )}
+                </VStack>
+              );
+            })}
           </VStack>
 
           {/* Промокод */}

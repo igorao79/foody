@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { Box, Flex, IconButton, Text, HStack } from '@chakra-ui/react';
-import { FiArrowLeft, FiHeart, FiShare2 } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import { FiArrowLeft, FiHeart, FiShare2, FiShoppingCart } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useCart } from '@/contexts/CartContext';
 
 const MotionBox = motion(Box);
 
@@ -13,9 +14,11 @@ interface HeaderProps {
   showBackButton?: boolean;
   showFavorites?: boolean;
   showShare?: boolean;
+  showCart?: boolean;
   onBackClick?: () => void;
   onFavoriteClick?: () => void;
   onShareClick?: () => void;
+  onCartClick?: () => void;
   rightElement?: React.ReactNode;
 }
 
@@ -24,18 +27,32 @@ export function Header({
   showBackButton = false,
   showFavorites = false,
   showShare = false,
+  showCart = false,
   onBackClick,
   onFavoriteClick,
   onShareClick,
+  onCartClick,
   rightElement,
 }: HeaderProps) {
   const router = useRouter();
+  const { getItemCount } = useCart();
+
+  const itemCount = getItemCount();
+  const displayCount = itemCount > 10 ? '10+' : itemCount.toString();
 
   const handleBackClick = () => {
     if (onBackClick) {
       onBackClick();
     } else {
       router.back();
+    }
+  };
+
+  const handleCartClick = () => {
+    if (onCartClick) {
+      onCartClick();
+    } else {
+      router.push('/cart');
     }
   };
 
@@ -102,6 +119,46 @@ export function Header({
             >
               <FiShare2 />
             </IconButton>
+          )}
+          {showCart && (
+            <Box position="relative">
+              <IconButton
+                aria-label="Корзина"
+                variant="ghost"
+                size="sm"
+                onClick={handleCartClick}
+                color="var(--gray-600)"
+                _hover={{ bg: 'var(--gray-100)', color: 'var(--primary)' }}
+              >
+                <FiShoppingCart />
+              </IconButton>
+              <AnimatePresence>
+                {itemCount > 0 && (
+                  <MotionBox
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    position="absolute"
+                    top="-2px"
+                    right="-2px"
+                    bg="var(--primary)"
+                    color="var(--white)"
+                    borderRadius="var(--radius-full)"
+                    minW="18px"
+                    h="18px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="var(--font-xs)"
+                    fontWeight="var(--font-bold)"
+                    px="var(--space-1)"
+                    boxShadow="0 2px 8px rgba(5, 56, 107, 0.3)"
+                  >
+                    {displayCount}
+                  </MotionBox>
+                )}
+              </AnimatePresence>
+            </Box>
           )}
           {rightElement}
         </HStack>

@@ -2,19 +2,27 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Text, VStack, HStack, Grid, GridItem, Container, Icon } from '@chakra-ui/react';
+import { Box, Text, VStack, HStack, Grid, GridItem, Container, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import { FiShoppingBag } from 'react-icons/fi';
 import { RestaurantCard } from '@/components/ui/cards/RestaurantCard';
 import { PromoCarousel } from '@/components/ui/carousel/PromoCarousel';
 import { DesktopHeader } from './DesktopHeader';
-import { categories, restaurants } from '@/utils/mockData';
+import { Footer } from '@/components/layout/Footer';
+import { categories, restaurants, dishes } from '@/utils/mockData';
+import { Restaurant, Dish } from '@/types';
+import { useCart } from '@/contexts/CartContext';
+import { FiMinus, FiPlus } from 'react-icons/fi';
+import { Icon } from '@chakra-ui/react';
 
 const MotionBox = motion(Box);
 
 export function DesktopHomePage() {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>();
+  const { addItem, getItemQuantity, removeItemByDishId } = useCart();
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchResults, setSearchResults] = useState<Array<{type: 'restaurant' | 'dish', restaurant: Restaurant, dish?: Dish}>>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState<boolean>(false);
 
   const handleRestaurantClick = (restaurantId: string) => {
     router.push(`/restaurant/${restaurantId}`);
@@ -22,16 +30,75 @@ export function DesktopHomePage() {
 
 
   const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId === selectedCategory ? undefined : categoryId);
+    setSelectedCategory(categoryId);
+  };
+
+  const handleSearch = (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+
+    const lowerQuery = query.toLowerCase().trim();
+
+    // Поиск по блюдам
+    const matchingDishes = dishes.filter(dish =>
+      dish.name.toLowerCase().includes(lowerQuery) ||
+      dish.description.toLowerCase().includes(lowerQuery) ||
+      dish.ingredients.some(ingredient => ingredient.toLowerCase().includes(lowerQuery)) ||
+      dish.category.toLowerCase().includes(lowerQuery)
+    );
+
+    // Группируем результаты по ресторанам
+    const dishResults = matchingDishes
+      .map(dish => {
+        const restaurant = restaurants.find(r => r.id === dish.restaurantId);
+        return restaurant ? {
+          type: 'dish' as const,
+          dish,
+          restaurant
+        } : null;
+      })
+      .filter(Boolean) as Array<{type: 'dish', restaurant: Restaurant, dish: Dish}>;
+
+    // Поиск по ресторанам
+    const matchingRestaurants = restaurants.filter(restaurant =>
+      restaurant.name.toLowerCase().includes(lowerQuery) ||
+      restaurant.cuisines.some(cuisine => cuisine.toLowerCase().includes(lowerQuery)) ||
+      restaurant.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
+      restaurant.description?.toLowerCase().includes(lowerQuery)
+    );
+
+    const restaurantResults = matchingRestaurants.map(restaurant => ({
+      type: 'restaurant' as const,
+      restaurant
+    }));
+
+    const allResults = [...dishResults, ...restaurantResults];
+    setSearchResults(allResults);
+    setShowSearchDropdown(allResults.length > 0);
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleDishClick = (_dish?: Dish) => {
+    // Теперь блюда добавляются через кнопки + в dropdown
+    // Этот обработчик можно оставить пустым или удалить
+  };
+
+  const handleRestaurantClickFromSearch = (restaurantId: string) => {
+    setShowSearchDropdown(false);
+    setSearchResults([]);
+    handleRestaurantClick(restaurantId);
   };
 
   // Фильтрация ресторанов по выбранной категории
-  const filteredRestaurants = selectedCategory
-    ? restaurants.filter(restaurant => {
+  const filteredRestaurants = selectedCategory === 'all'
+    ? restaurants
+    : restaurants.filter(restaurant => {
         const selectedCategoryName = categories.find(cat => cat.id === selectedCategory)?.name;
         return selectedCategoryName && restaurant.cuisines.includes(selectedCategoryName);
-      })
-    : restaurants;
+      });
 
   return (
     <MotionBox
@@ -41,7 +108,7 @@ export function DesktopHomePage() {
       minH="100vh"
       bg="var(--background)"
     >
-      <DesktopHeader onSearch={setSearchQuery} />
+      <DesktopHeader onSearch={handleSearch} />
 
       <Container maxW="1400px" py="var(--space-6)" pt="120px">
         {/* Основной контент */}
@@ -56,7 +123,7 @@ export function DesktopHomePage() {
               boxShadow="var(--shadow-md)"
             >
               {/* Категории кухни */}
-              <Box p="var(--space-4)" borderBottom="1px solid var(--gray-100)">
+              <Box pt="var(--space-4)" pr="var(--space-4)" pb="var(--space-2)" pl="var(--space-4)" borderBottom="1px solid var(--gray-100)">
                 <Text
                   fontSize="var(--font-lg)"
                   fontWeight="var(--font-semibold)"
@@ -95,7 +162,16 @@ export function DesktopHomePage() {
                         }}
                       >
                         <HStack gap="var(--space-3)">
-                          {typeof category.icon === 'function' ? (
+                          {category.id === 'all' ? (
+                            <Image
+                              src="/images/logo.webp"
+                              alt="Logo"
+                              w="20px"
+                              h="20px"
+                              objectFit="contain"
+                              borderRadius="var(--radius-sm)"
+                            />
+                          ) : typeof category.icon === 'function' ? (
                             <category.icon size={20} color={isSelected ? 'var(--white)' : category.color} />
                           ) : (
                             <Icon as={category.icon} boxSize={5} />
@@ -129,17 +205,17 @@ export function DesktopHomePage() {
                       fontWeight="var(--font-semibold)"
                       color="var(--primary)"
                     >
-                      {selectedCategory
-                        ? `${categories.find(cat => cat.id === selectedCategory)?.name} рестораны`
-                        : 'Рекомендуемые рестораны'
+                      {selectedCategory === 'all'
+                        ? 'Рекомендуемые рестораны'
+                        : `${categories.find(cat => cat.id === selectedCategory)?.name} рестораны`
                       }
                     </Text>
-                    {selectedCategory && (
+                    {selectedCategory !== 'all' && (
                       <Text
                         fontSize="var(--font-sm)"
                         color="var(--gray-600)"
                         cursor="pointer"
-                        onClick={() => setSelectedCategory(undefined)}
+                        onClick={() => setSelectedCategory('all')}
                         _hover={{ color: 'var(--primary)' }}
                       >
                         Сбросить фильтр ×
@@ -182,7 +258,7 @@ export function DesktopHomePage() {
                         fontSize="var(--font-base)"
                         color="var(--accent)"
                         cursor="pointer"
-                        onClick={() => setSelectedCategory(undefined)}
+                        onClick={() => setSelectedCategory('all')}
                         _hover={{ textDecoration: 'underline' }}
                       >
                         Показать все рестораны
@@ -190,11 +266,162 @@ export function DesktopHomePage() {
                     </Box>
                   )}
                 </Grid>
+
+                {/* Dropdown с результатами поиска */}
+                {showSearchDropdown && searchResults.length > 0 && (
+                  <MotionBox
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    position="fixed"
+                    top="80px"
+                    left="41%"
+                    w="564px"
+                    maxW="calc(100vw - var(--space-6))"
+                    bg="var(--white)"
+                    borderRadius="var(--radius-lg)"
+                    boxShadow="var(--shadow-xl)"
+                    border="1px solid var(--gray-200)"
+                    zIndex={1000}
+                    maxH="400px"
+                    overflowY="auto"
+                  >
+                    <VStack align="stretch" gap={0}>
+                      {searchResults.slice(0, 8).map((result, index) => {
+                        if (result.type === 'restaurant') {
+                          return (
+                            <Box
+                              key={`restaurant-${result.restaurant.id}`}
+                              p="var(--space-3)"
+                              cursor="pointer"
+                              _hover={{ bg: 'var(--gray-50)' }}
+                              onClick={() => handleRestaurantClickFromSearch(result.restaurant.id)}
+                              borderBottom={index < searchResults.length - 1 ? "1px solid var(--gray-100)" : "none"}
+                            >
+                              <HStack gap="var(--space-3)">
+                                <Icon as={FiShoppingBag} boxSize={4} color="var(--primary)" />
+                                <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                                  {result.restaurant.name}
+                                </Text>
+                                <Text fontSize="var(--font-sm)" color="var(--gray-500)">
+                                  Ресторан
+                                </Text>
+                              </HStack>
+                            </Box>
+                          );
+                        } else if (result.type === 'dish' && result.dish) {
+                          const dish = result.dish;
+                          const categoryIcon = categories.find(cat => cat.name === dish.category)?.icon;
+                          return (
+                            <Box
+                              key={`dish-${dish.id}-${index}`}
+                              p="var(--space-3)"
+                              cursor="pointer"
+                              _hover={{ bg: 'var(--gray-50)' }}
+                              onClick={() => handleDishClick(dish)}
+                              borderBottom={index < searchResults.length - 1 ? "1px solid var(--gray-100)" : "none"}
+                            >
+                              <VStack align="flex-start" gap="var(--space-1)">
+                                <HStack justify="space-between" w="100%" align="flex-start">
+                                  <VStack align="flex-start" gap="var(--space-1)" flex={1}>
+                                    <HStack gap="var(--space-2)">
+                                      {categoryIcon && (
+                                        <Icon
+                                          as={categoryIcon}
+                                          boxSize={4}
+                                          color="var(--primary)"
+                                        />
+                                      )}
+                                      <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
+                                        {dish.name}
+                                      </Text>
+                                    </HStack>
+                                    <Text fontSize="var(--font-sm)" color="var(--gray-600)" style={{
+                                      display: '-webkit-box',
+                                      WebkitLineClamp: 1,
+                                      WebkitBoxOrient: 'vertical' as const,
+                                      overflow: 'hidden'
+                                    }}>
+                                      от {result.restaurant?.name}
+                                    </Text>
+                                  </VStack>
+                                  <HStack gap="var(--space-1)" align="center">
+                                    <Box
+                                      as="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const currentQuantity = getItemQuantity(dish.id);
+                                        if (currentQuantity > 0) {
+                                          removeItemByDishId(dish.id);
+                                        }
+                                      }}
+                                      w="24px"
+                                      h="24px"
+                                      bg="var(--gray-100)"
+                                      color="var(--gray-700)"
+                                      borderRadius="var(--radius-full)"
+                                      display="flex"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      _hover={{ bg: 'var(--gray-200)' }}
+                                      _active={{ transform: 'scale(0.9)' }}
+                                      opacity={getItemQuantity(dish.id) === 0 ? 0.5 : 1}
+                                      cursor={getItemQuantity(dish.id) === 0 ? 'not-allowed' : 'pointer'}
+                                      transition="all 0.2s ease"
+                                    >
+                                      <FiMinus size={12} />
+                                    </Box>
+                                    <Text
+                                      fontSize="var(--font-sm)"
+                                      fontWeight="var(--font-bold)"
+                                      color="var(--gray-700)"
+                                      minW="20px"
+                                      textAlign="center"
+                                    >
+                                      {getItemQuantity(dish.id)}
+                                    </Text>
+                                    <Box
+                                      as="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        addItem(dish, 1);
+                                      }}
+                                      w="24px"
+                                      h="24px"
+                                      bg="var(--gray-100)"
+                                      color="var(--gray-700)"
+                                      borderRadius="var(--radius-full)"
+                                      display="flex"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      _hover={{ bg: 'var(--gray-200)' }}
+                                      _active={{ transform: 'scale(0.9)' }}
+                                      transition="all 0.2s ease"
+                                      cursor="pointer"
+                                    >
+                                      <FiPlus size={12} />
+                                    </Box>
+                                  </HStack>
+                                </HStack>
+                                <Text fontSize="var(--font-sm)" fontWeight="var(--font-semibold)" color="var(--primary)" textAlign="right">
+                                  {dish.price}₽
+                                </Text>
+                              </VStack>
+                            </Box>
+                          );
+                        } else {
+                          return null;
+                        }
+                      })}
+                    </VStack>
+                  </MotionBox>
+                )}
               </Box>
             </VStack>
           </GridItem>
         </Grid>
       </Container>
+      <Footer />
     </MotionBox>
   );
 }

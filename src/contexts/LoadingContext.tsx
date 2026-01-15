@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 
 interface LoadingContextType {
   isLoading: boolean;
@@ -13,10 +14,10 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Имитация загрузки приложения
+    // Показываем лоадер на 800мс для демонстрации анимации
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000); // 2 секунды для демонстрации
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);

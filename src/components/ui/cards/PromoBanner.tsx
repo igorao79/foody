@@ -71,22 +71,6 @@ export function PromoBanner({ banner, onClick }: PromoBannerProps) {
               >
                 {banner.title}
               </Text>
-              <Text
-                fontSize="var(--font-sm)"
-                opacity={0.9}
-                lineHeight="1.3"
-              >
-                {banner.description}
-              </Text>
-              {banner.discount && (
-                <Text
-                  fontSize="var(--font-lg)"
-                  fontWeight="var(--font-bold)"
-                  color="var(--accent)"
-                >
-                  -{banner.discount}%
-                </Text>
-              )}
             </VStack>
           </Box>
         </Box>

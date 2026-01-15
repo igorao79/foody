@@ -3,7 +3,13 @@
 import React from 'react';
 import { Box, Text, VStack, HStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { DishSize } from '@/types';
+// Local type definition
+interface DishSize {
+  id: string;
+  name: string;
+  price: number;
+  calories?: number;
+}
 
 const MotionBox = motion(Box);
 

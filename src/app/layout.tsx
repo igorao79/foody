@@ -21,6 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
+      <head>
+        <link rel="preload" href="/lotties/loader.lottie" as="fetch" />
+      </head>
       <body className={`${inter.variable} antialiased`}>
         <Providers>
           <AppLoader />

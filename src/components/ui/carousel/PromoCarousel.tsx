@@ -1,9 +1,9 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Box, Text, HStack, VStack } from '@chakra-ui/react';
 import { FiChevronLeft, FiChevronRight, FiGift, FiPercent, FiStar } from 'react-icons/fi';
-import { PromoModal } from '../modals/PromoModal';
+import { PromoModal } from '@/components/ui/modals/PromoModal';
 
 interface PromoItem {
   id: string;
@@ -70,6 +70,15 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const totalPages = Math.ceil(promoItems.length / itemsPerPage);
 
+  // Авто-переключение каждые 10 секунд
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPage((prev) => (prev < totalPages - 1 ? prev + 1 : 0));
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [totalPages]);
+
   const startIndex = currentPage * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentItems = promoItems.slice(startIndex, endIndex);
@@ -93,7 +102,10 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
     <Box
       bg="var(--white)"
       borderRadius="var(--radius-lg)"
-      p="var(--space-4)"
+      pt="var(--space-4)"
+      pr="var(--space-4)"
+      pb="var(--space-2)"
+      pl="var(--space-4)"
       boxShadow="var(--shadow-sm)"
       position="relative"
     >
@@ -139,16 +151,14 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
               </Box>
 
               <VStack align="flex-start" gap="var(--space-1)" flex={1} minH="auto">
-                <HStack justify="space-between" align="flex-start" w="100%">
-                  <Text fontSize="var(--font-base)" fontWeight="var(--font-semibold)" color="var(--primary)">
-                    {item.title}
-                  </Text>
-                  <Text fontSize="var(--font-sm)" fontWeight="var(--font-bold)" color={item.color}>
-                    {item.discount}
-                  </Text>
-                </HStack>
-                <Text fontSize="var(--font-sm)" color="var(--gray-600)" lineHeight="1.3">
-                  {item.description}
+                <Text
+                  fontSize="var(--font-base)"
+                  fontWeight="var(--font-semibold)"
+                  color="var(--primary)"
+                  wordBreak="break-word"
+                  lineHeight="1.2"
+                >
+                  {item.title}
                 </Text>
               </VStack>
             </HStack>
@@ -157,7 +167,7 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
       </VStack>
 
       {/* Навигация */}
-      <HStack justify="space-between" align="center" mt="var(--space-2)" px="var(--space-2)">
+      <HStack justify="space-between" align="center" px="var(--space-2)">
         {/* Стрелка влево */}
         <Box
           as="button"
@@ -171,7 +181,7 @@ export function PromoCarousel({ itemsPerPage = 1 }: PromoCarouselProps) {
         </Box>
 
         {/* Пагинация */}
-        <HStack gap="var(--space-1)">
+        <HStack gap="var(--space-3)">
           {Array.from({ length: totalPages }, (_, index) => (
             <Box
               key={index}

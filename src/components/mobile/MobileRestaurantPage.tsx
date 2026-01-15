@@ -1,21 +1,17 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Box } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/ui/navigation/Header';
 import { RestaurantHeader } from '@/components/restaurant/RestaurantHeader';
 import { MenuTabs } from '@/components/restaurant/MenuTabs';
-import { FloatingCartButton } from '@/components/cart/FloatingCartButton';
-import { useCart } from '@/contexts/CartContext';
 import { restaurants, dishes } from '@/utils/mockData';
 
 const MotionBox = motion(Box);
 
 export function MobileRestaurantPage() {
   const params = useParams();
-  const router = useRouter();
-  const { cart, getItemCount } = useCart();
 
   const restaurantId = params?.id as string;
   const restaurant = restaurants.find(r => r.id === restaurantId);
@@ -28,13 +24,10 @@ export function MobileRestaurantPage() {
     );
   }
 
-  const handleDishClick = (dish: { id: string }) => {
-    router.push(`/dish/${dish.id}?restaurant=${restaurantId}`);
-  };
+  // Фильтруем блюда по restaurantId
+  const restaurantDishes = dishes.filter(dish => dish.restaurantId === restaurantId);
 
-  const handleCartClick = () => {
-    router.push('/cart');
-  };
+  // handleDishClick больше не используется, модальное окно открывается в MenuTabs
 
   return (
     <MotionBox
@@ -48,6 +41,7 @@ export function MobileRestaurantPage() {
         title={restaurant.name}
         showFavorites
         showShare
+        showCart
       />
 
       {/* Restaurant Header */}
@@ -55,15 +49,7 @@ export function MobileRestaurantPage() {
 
       {/* Menu Tabs */}
       <MenuTabs
-        dishes={dishes}
-        onDishClick={handleDishClick}
-      />
-
-      {/* Floating Cart Button */}
-      <FloatingCartButton
-        itemCount={getItemCount()}
-        totalPrice={cart.total}
-        onClick={handleCartClick}
+        dishes={restaurantDishes}
       />
     </MotionBox>
   );
