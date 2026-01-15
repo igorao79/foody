@@ -41,13 +41,15 @@ export default function CheckoutPage() {
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Сбрасываем delivery-состояния при переключении на самовывоз
+  // Автоматически устанавливаем адрес в зависимости от типа заказа
   useEffect(() => {
     if (orderType === 'pickup') {
-      setDeliveryTime('asap');
-      setSelectedAddress('');
+      const pickupAddresses = getPickupAddresses();
+      if (pickupAddresses.length > 0) {
+        setSelectedAddress(pickupAddresses[0]);
+      }
     }
-  }, [orderType]);
+  }, [orderType, cart.items]);
 
   // Debug logging
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function CheckoutPage() {
   const steps = orderType === 'pickup' ? pickupSteps : deliverySteps;
 
   const handlePlaceOrder = () => {
-    if (!selectedAddress.trim()) {
+    if (orderType === 'delivery' && !selectedAddress.trim()) {
       return;
     }
     setShowProgressModal(true);
@@ -333,9 +335,9 @@ export default function CheckoutPage() {
             _hover={{ bg: !selectedAddress.trim() ? 'var(--gray-400)' : 'var(--secondary)' }}
             _active={{ bg: !selectedAddress.trim() ? 'var(--gray-400)' : 'var(--secondary)' }}
             onClick={handlePlaceOrder}
-            disabled={!selectedAddress.trim()}
+            disabled={orderType === 'delivery' && !selectedAddress.trim()}
           >
-            {!selectedAddress.trim() ? 'Выберите адрес доставки' : `Оформить заказ • ${cart.items.reduce((sum, item) => sum + item.totalPrice, 0) + (orderType === 'delivery' ? cart.deliveryFee : 0) - cart.discount}₽`}
+            {orderType === 'delivery' && !selectedAddress.trim() ? 'Выберите адрес доставки' : `Оформить заказ • ${cart.items.reduce((sum, item) => sum + item.totalPrice, 0) + (orderType === 'delivery' ? cart.deliveryFee : 0) - cart.discount}₽`}
           </Button>
         </Box>
       </MotionBox>

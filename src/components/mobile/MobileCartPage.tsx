@@ -64,16 +64,25 @@ export function MobileCartPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
+        minH="100vh"
+        display="flex"
+        flexDirection="column"
       >
         <Header title="Корзина" showBackButton showSearch={true} />
 
-        <VStack
-          gap="var(--space-4)"
+        <Box
+          flex={1}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
           p="var(--space-4)"
-          align="center"
-          justify="center"
-          minH="60vh"
         >
+          <VStack
+            gap="var(--space-4)"
+            align="center"
+            justify="center"
+            textAlign="center"
+          >
           <Text
             fontSize="var(--font-4xl)"
             opacity={0.5}
@@ -110,7 +119,8 @@ export function MobileCartPage() {
           >
             Выбрать ресторан
           </Button>
-        </VStack>
+          </VStack>
+        </Box>
       </MotionBox>
     );
   }
