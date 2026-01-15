@@ -48,8 +48,20 @@ export default function CheckoutPage() {
       if (pickupAddresses.length > 0) {
         setSelectedAddress(pickupAddresses[0]);
       }
+    } else {
+      setSelectedAddress('');
     }
-  }, [orderType, cart.items]);
+  }, [orderType]);
+
+  // Обновляем адрес при изменении корзины (если тип заказа - самовывоз)
+  useEffect(() => {
+    if (orderType === 'pickup') {
+      const pickupAddresses = getPickupAddresses();
+      if (pickupAddresses.length > 0) {
+        setSelectedAddress(pickupAddresses[0]);
+      }
+    }
+  }, [cart.items]);
 
   // Debug logging
   useEffect(() => {
